@@ -1,0 +1,36 @@
+{
+  "code_actions_on_format": {
+    "source.fixAll.eslint": true,
+    "source.organizeImports": true,
+    "source.removeUnusedImports": true
+  },
+
+  "prettier": {
+    "allowed": true,
+    "plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"]
+  },
+
+  "languages": {
+    "Svelte": {
+      "language_servers": ["svelte-language-server"],
+      "prettier": {
+        "allowed": true,
+        "plugins": ["prettier-plugin-svelte"]
+      },
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true,
+        "source.organizeImports": true
+      }
+    },
+    "JSON": {
+      "prettier": { "allowed": true }
+    },
+    "JSONC": {
+      "prettier": { "allowed": true }
+    },
+
+    "TypeScript": { "prettier": { "allowed": true } },
+    "JavaScript": { "prettier": { "allowed": true } },
+    "CSS": { "prettier": { "allowed": true } }
+  }
+}

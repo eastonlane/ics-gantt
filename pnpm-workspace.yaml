@@ -1,0 +1,18 @@
+minimumReleaseAgeExclude:
+  - i18next-browser-languagedetector@8.3.0
+  - i18next@26.7.1
+  - react-i18next@17.1.11
+  - '@lucide/svelte@1.71.0'
+  - '@typescript-eslint/eslint-plugin@8.72.2'
+  - '@typescript-eslint/parser@8.72.2'
+  - '@typescript-eslint/project-service@8.72.2'
+  - '@typescript-eslint/scope-manager@8.72.2'
+  - '@typescript-eslint/tsconfig-utils@8.72.2'
+  - '@typescript-eslint/type-utils@8.72.2'
+  - '@typescript-eslint/types@8.72.2'
+  - '@typescript-eslint/typescript-estree@8.72.2'
+  - '@typescript-eslint/utils@8.72.2'
+  - '@typescript-eslint/visitor-keys@8.72.2'
+  - typescript-eslint@8.72.2
+allowBuilds:
+  esbuild: true
