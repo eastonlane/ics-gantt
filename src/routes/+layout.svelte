@@ -1,14 +1,24 @@
 <script lang="ts">
+  import * as Select from '$lib/components/ui/select';
+  import * as Sidebar from '$lib/components/ui/sidebar';
   import { TooltipProvider } from '$lib/components/ui/tooltip';
   import { appStateKey } from '$lib/const';
   import { createAppState } from '$lib/state.svelte';
+  import { initStore, restoreCalendars } from '$lib/stores/data';
+  import { sidebarContent } from '$lib/stores/sidebar';
   import type { SupportedLocale } from '$lib/types/locale';
   import { setContext } from 'svelte';
   import './layout.css';
 
   let { children } = $props();
 
+  initStore();
+  restoreCalendars().catch((error) => {
+    console.error('Unable to load saved calendars:', error);
+  });
+
   const appState = createAppState();
+
   setContext(appStateKey, appState);
 
   let isDark = $state(false);
@@ -26,30 +36,46 @@
   });
 </script>
 
-<header>
-  <div class="header-left">
-    <strong>ICS Gantt</strong>
-  </div>
+<Sidebar.Provider>
+  {#if $sidebarContent}
+    {@render $sidebarContent()}
+  {/if}
+  <Sidebar.Inset class="min-w-0">
+    <main>
+      <div class="header">
+        <div class="header-left">
+          <Sidebar.Trigger />
+          <strong>ICS Gantt</strong>
+        </div>
 
-  <div class="app-control">
-    <div class="theme-switch-wrapper">
-      <label class="theme-switch">
-        <input type="checkbox" bind:checked={isDark} />
-        <div class="slider round"></div>
-      </label>
-    </div>
+        <div class="app-control">
+          <div class="theme-switch-wrapper">
+            <label class="theme-switch">
+              <input type="checkbox" bind:checked={isDark} />
+              <div class="slider round"></div>
+            </label>
+          </div>
 
-    <select bind:value={locale}>
-      <option value="en">English</option>
-      <option value="zh-CN">简体中文</option>
-    </select>
-  </div>
-</header>
-<main>
-  <TooltipProvider>
-    {@render children()}
-  </TooltipProvider>
-</main>
+          <Select.Root type="single" bind:value={locale}>
+            <Select.Trigger class="w-45">
+              <Select.Value placeholder="Theme" />
+            </Select.Trigger>
+            <Select.Content>
+              <Select.Group>
+                <Select.Item value="en" label="English" />
+                <Select.Item value="zh-CN" label="简体中文" />
+              </Select.Group>
+            </Select.Content>
+          </Select.Root>
+        </div>
+      </div>
+      <TooltipProvider>
+        {@render children()}
+      </TooltipProvider>
+    </main>
+  </Sidebar.Inset>
+</Sidebar.Provider>
+
 <footer></footer>
 
 <style>
@@ -77,7 +103,7 @@
     -webkit-text-size-adjust: 100%;
   }
 
-  header {
+  .header {
     grid-area: header;
     background-color: var(--header-bg);
     color: var(--header-text);

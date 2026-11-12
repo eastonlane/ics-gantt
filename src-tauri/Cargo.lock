@@ -1555,11 +1555,22 @@ dependencies = [
 name = "ics-gantt"
 version = "0.1.0"
 dependencies = [
+ "ics-gantt-core",
  "serde",
  "serde_json",
  "tauri",
  "tauri-build",
  "tauri-plugin-opener",
+ "tempfile",
+]
+
+[[package]]
+name = "ics-gantt-core"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tempfile",
 ]
 
 [[package]]

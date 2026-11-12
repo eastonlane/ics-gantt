@@ -6,39 +6,41 @@
     EventRangeFilterComp,
     EventRecentFilterComp,
   } from '$lib/components/EventFilter';
+  import { CalendarPageSidebar } from '$lib/components/sidebar';
   import SVARGanttChart from '$lib/components/svar-gantt/SVARGanttChart.svelte';
   import Button from '$lib/components/ui/button/button.svelte';
-  import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-  } from '$lib/components/ui/select';
+  import * as Select from '$lib/components/ui/select';
   import { appStateKey } from '$lib/const';
   import type { createAppState } from '$lib/state.svelte';
+  import { appCalendarStore } from '$lib/stores/data';
+  import { sidebarContent } from '$lib/stores/sidebar';
   import type {
     EventFilterType,
     EventFilterWithId,
   } from '$lib/utils/ics-event-filter';
-  import { getContext } from 'svelte';
-  import { convertIcsCalendar, type IcsCalendar } from 'ts-ics';
+  import { getContext, onMount } from 'svelte';
+  import { type IcsCalendar } from 'ts-ics';
 
   let appState = getContext<ReturnType<typeof createAppState>>(appStateKey);
   let locale = $derived(appState.locale);
 
-  let fileInputRef = $state.raw<HTMLInputElement | undefined>();
-  let files = $state<FileList>();
-  $effect(() => {
-    if (files && files[0]) {
-      files[0].text().then((str) => {
-        icsCalendar = convertIcsCalendar(undefined, str);
-      });
-    }
+  onMount(() => {
+    sidebarContent.set(sidebar);
+    return () => {
+      sidebarContent.set(null);
+    };
   });
 
-  let icsCalendar = $state<IcsCalendar>();
+  let icsCalendar = $derived.by<IcsCalendar | null>(() => {
+    if (!$appCalendarStore.length) {
+      return null;
+    }
+    const item = $appCalendarStore.find((x) => x.isVisible);
+    if (!item) {
+      return null;
+    }
+    return item.icsCalendar;
+  });
   let icsEvents = $derived(
     (icsCalendar?.events ?? []).filter((x) =>
       x.end ? x.end >= x.start : true,
@@ -74,28 +76,32 @@
   }
 </script>
 
+{#snippet sidebar()}
+  <CalendarPageSidebar />
+{/snippet}
+
 <div class="page-container">
-  {#if icsCalendar && icsCalendar.events}
+  {#if icsCalendar?.events}
     <div class="gantt-wrapper">
       <div class="tool-bar">
-        <Select
+        <Select.Root
           type="single"
           bind:value={selectedFilterType}
           items={filterTypeItems}
         >
-          <SelectTrigger class="w-45">
-            <SelectValue placeholder="Theme" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
+          <Select.Trigger class="w-45">
+            <Select.Value placeholder="Filter" />
+          </Select.Trigger>
+          <Select.Content>
+            <Select.Group>
               {#each filterTypeItems as item (item)}
-                <SelectItem value={item.value}>
+                <Select.Item value={item.value}>
                   {item.label}
-                </SelectItem>
+                </Select.Item>
               {/each}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+            </Select.Group>
+          </Select.Content>
+        </Select.Root>
         <Button disabled={!filters?.length} onclick={() => (filters = [])}
           >Reset Filters</Button
         >
@@ -142,7 +148,7 @@
       <SVARGanttChart {events} {locale} isDark={appState.isDarkTheme} />
     </div>
   {:else}
-    <div>
+    <!-- <div>
       <Button onclick={(_) => fileInputRef?.click()}>Upload</Button>
       <input
         style="display: none"
@@ -151,7 +157,7 @@
         bind:files
         bind:this={fileInputRef}
       />
-    </div>
+    </div> -->
   {/if}
 </div>
 
