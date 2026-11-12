@@ -1,4 +1,5 @@
 <script lang="ts">
+  import * as Select from '$lib/components/ui/select';
   import {
     categoriesWhiteFilter,
     type EventFilterType,
@@ -23,13 +24,20 @@
   }
 </script>
 
-<select bind:value={seletedCategories} multiple>
-  {#each categories as category (category)}
-    {#key category}
-      <option value={category}>{category}</option>
-    {/key}
-  {/each}
-</select>
+<Select.Root type="multiple" bind:value={seletedCategories}>
+  <Select.Trigger>
+    <Select.Value placeholder="Category" />
+  </Select.Trigger>
+  <Select.Content>
+    <Select.Group>
+      {#each categories as category (category)}
+        {#key category}
+          <Select.Item value={category} label={category} />
+        {/key}
+      {/each}
+    </Select.Group>
+  </Select.Content>
+</Select.Root>
 <Button
   onclick={() => {
     if (seletedCategories) {
