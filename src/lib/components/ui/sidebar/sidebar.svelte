@@ -20,6 +20,7 @@
 	} = $props();
 
 	const sidebar = useSidebar();
+    import i18n from '$lib/i18n';
 </script>
 
 {#if collapsible === "none"}
@@ -48,8 +49,8 @@
 			{side}
 		>
 			<Sheet.Header class="sr-only">
-				<Sheet.Title>Sidebar</Sheet.Title>
-				<Sheet.Description>Displays the mobile sidebar.</Sheet.Description>
+				<Sheet.Title>{$i18n.t('a11y.sidebar')}</Sheet.Title>
+				<Sheet.Description>{$i18n.t('a11y.mobileSidebarDescription')}</Sheet.Description>
 			</Sheet.Header>
 			<div class="flex h-full w-full flex-col">
 				{@render children?.()}

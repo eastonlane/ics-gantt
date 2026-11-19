@@ -1,5 +1,6 @@
 <script lang="ts">
   import * as Select from '$lib/components/ui/select';
+  import i18n from '$lib/i18n';
   import {
     categoriesBlackFilter,
     type EventFilterType,
@@ -31,7 +32,7 @@
 
 <Select.Root type="multiple" bind:value={seletedCategories}>
   <Select.Trigger>
-    <Select.Value placeholder="Category" />
+    <Select.Value placeholder={$i18n.t('filters.categoryPlaceholder')} />
   </Select.Trigger>
   <Select.Content>
     <Select.Group>
@@ -52,12 +53,12 @@
       });
       resetInput();
     }
-  }}>{isEdit ? 'Edit' : 'Add'} filter</Button
+  }}>{$i18n.t(isEdit ? 'filters.editFilter' : 'filters.addFilter')}</Button
 >
 {#if isEdit}
   <Button
     onclick={() => {
       onremove(filterType);
-    }}>Remove filter</Button
+    }}>{$i18n.t('filters.removeFilter')}</Button
   >
 {/if}

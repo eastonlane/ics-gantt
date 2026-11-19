@@ -13,6 +13,7 @@
 	}: WithElementRef<HTMLAttributes<HTMLDivElement>> & {
 		showCloseButton?: boolean;
 	} = $props();
+  import i18n from '$lib/i18n';
 </script>
 
 <div
@@ -25,7 +26,7 @@
 	{#if showCloseButton}
 		<DialogPrimitive.Close>
 			{#snippet child({ props })}
-				<Button variant="outline" {...props}>Close</Button>
+				<Button variant="outline" {...props}>{$i18n.t('a11y.close')}</Button>
 			{/snippet}
 		</DialogPrimitive.Close>
 	{/if}

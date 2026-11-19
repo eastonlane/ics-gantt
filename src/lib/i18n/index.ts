@@ -1,13 +1,17 @@
 // i18n/index.ts
-import i18n from 'i18next';
+import { langKey } from '$lib/const';
+import i18next from 'i18next';
+import { createI18nStore } from 'svelte-i18next';
 import en from './en';
-import zh from './zh';
+import zhCN from './zh-CN';
 
-void i18n.init({
-  resources: { en: { translation: en }, zh: { translation: zh } },
-  lng: localStorage.getItem('lang') ?? 'en',
+void i18next.init({
+  resources: { en: { translation: en }, 'zh-CN': { translation: zhCN } },
+  lng: localStorage.getItem(langKey) ?? 'en',
   fallbackLng: 'en',
   interpolation: { escapeValue: false },
 });
 
+const i18n = createI18nStore(i18next);
+export { i18next };
 export default i18n;

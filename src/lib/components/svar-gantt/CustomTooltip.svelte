@@ -1,5 +1,6 @@
 <script lang="ts">
   import { DAY, HOUR } from '$lib/const.time';
+  import i18n from '$lib/i18n';
   import type { CustomTooltipContentData } from '$lib/types/svar-comp';
   import type { AppTask } from '$lib/types/svar-task';
   import { format } from 'date-fns';
@@ -15,17 +16,21 @@
   function getRemainingTime(end: Date): string {
     const remaining = end.getTime() - new Date().getTime();
     if (remaining <= 0) {
-      return 'Finished';
+      return $i18n.t('chart.tooltip.finished');
     }
-    const remaingDays = Math.floor(remaining / DAY);
-    if (remaingDays > 0) {
-      return `${remaingDays} days`;
+    const remainingDays = Math.floor(remaining / DAY);
+    if (remainingDays > 0) {
+      return $i18n.t('chart.tooltip.remainingDays', {
+        count: remainingDays,
+      });
     }
     const remainingHours = Math.floor(remaining / HOUR);
     if (remainingHours > 0) {
-      return `${remainingHours} Hours`;
+      return $i18n.t('chart.tooltip.remainingHours', {
+        count: remainingHours,
+      });
     }
-    return 'Less than one hour';
+    return $i18n.t('chart.tooltip.lessThanOneHour');
   }
 </script>
 
@@ -39,13 +44,19 @@
 {#if 'task' in data}
   {@const task = data.task as AppTask}
   <div class="data">
-    {@render row('Name', task.text)}
+    {@render row($i18n.t('chart.tooltip.name'), task.text)}
     {#if task.start}
-      {@render row('Start date', format(task.start, mask))}
+      {@render row(
+        $i18n.t('chart.tooltip.startDate'),
+        format(task.start, mask),
+      )}
     {/if}
     {#if task.end}
-      {@render row('End date', format(task.end, mask))}
-      {@render row('Remaining time', getRemainingTime(task.end))}
+      {@render row($i18n.t('chart.tooltip.endDate'), format(task.end, mask))}
+      {@render row(
+        $i18n.t('chart.tooltip.remainingTime'),
+        getRemainingTime(task.end),
+      )}
     {/if}
   </div>
 {/if}

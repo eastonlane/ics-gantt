@@ -1,5 +1,6 @@
 <script lang="ts">
   import * as Tooltip from '$lib/components/ui/tooltip';
+  import i18n from '$lib/i18n';
   import {
     rangeFilter,
     type EventFilterType,
@@ -17,10 +18,10 @@
 
   let confirmDisableReason = $derived.by<string>(() => {
     if (!startDate && !endDate) {
-      return 'Please set the range!';
+      return $i18n.t('filters.rangeRequired');
     }
     if (startDate && endDate && startDate > endDate) {
-      return 'Start date is after end date!';
+      return $i18n.t('filters.invalidRange');
     }
     return '';
   });
@@ -33,7 +34,7 @@
     );
     if (!filter) {
       // TODO: toast the error
-      throw new Error('invalid range');
+      throw new Error($i18n.t('filters.invalidRangeError'));
     }
     onadd({
       type: filterType,
@@ -54,7 +55,7 @@
           aria-disabled={isConfirmDisabled}
           onclick={confirmFilter}
         >
-          {isEdit ? 'Edit' : 'Add'} Filter
+          {$i18n.t(isEdit ? 'filters.editFilter' : 'filters.addFilter')}
         </Button>
       </span>
     {/snippet}
@@ -70,6 +71,6 @@
   <Button
     onclick={() => {
       onremove(filterType);
-    }}>Remove filter</Button
+    }}>{$i18n.t('filters.removeFilter')}</Button
   >
 {/if}

@@ -15,6 +15,7 @@
 	} = $props();
 
 	const sidebar = useSidebar();
+    import i18n from '$lib/i18n';
 </script>
 
 <Button
@@ -32,5 +33,5 @@
 	{...restProps}
 >
 	<PanelLeftIcon class="cn-rtl-flip" />
-	<span class="sr-only">Toggle Sidebar</span>
+	<span class="sr-only">{$i18n.t('a11y.toggleSidebar')}</span>
 </Button>

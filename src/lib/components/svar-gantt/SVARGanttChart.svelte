@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Button } from '$lib/components/ui/button';
+  import i18n from '$lib/i18n';
   import type { SupportedLocale } from '$lib/types/locale';
   import type { AppTask } from '$lib/types/svar-task';
   import { getDayFormat, getYearMonthFormat } from '$lib/utils/locale.date';
@@ -47,7 +48,7 @@
   let columns = $derived<false | Array<IColumnConfig> | undefined>([
     {
       id: 'text',
-      header: 'Task name',
+      header: $i18n.t('chart.taskName'),
       width: 120,
       flexgrow: 2,
     },
@@ -83,7 +84,7 @@
 
 <div class="gantt-wrapper">
   <div class="chart-control">
-    <Button onclick={() => scrollToDate(new Date())}>Today</Button>
+    <Button onclick={() => scrollToDate(new Date())}>{$i18n.t('chart.today')}</Button>
   </div>
   {#if isDark}
     <WillowDark>
