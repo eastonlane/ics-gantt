@@ -84,7 +84,9 @@
 
 <div class="gantt-wrapper">
   <div class="chart-control">
-    <Button onclick={() => scrollToDate(new Date())}>{$i18n.t('chart.today')}</Button>
+    <Button onclick={() => scrollToDate(new Date())}
+      >{$i18n.t('chart.today')}</Button
+    >
   </div>
   {#if isDark}
     <WillowDark>
