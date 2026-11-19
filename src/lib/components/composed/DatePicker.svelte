@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Button } from '$lib/components/ui/button/index.js';
   import { Calendar } from '$lib/components/ui/calendar/index.js';
+  import i18n from '$lib/i18n';
   import * as Popover from '$lib/components/ui/popover/index.js';
   import type { SupportedLocale } from '$lib/types/locale';
   import { cn } from '$lib/utils.js';
@@ -35,7 +36,7 @@
         {...props}
       >
         <CalendarIcon class="me-2 size-4" />
-        {value ? df.format(value.toDate(getLocalTimeZone())) : 'Select a date'}
+        {value ? df.format(value.toDate(getLocalTimeZone())) : $i18n.t('common.selectDate')}
       </Button>
     {/snippet}
   </Popover.Trigger>

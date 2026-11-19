@@ -3,6 +3,7 @@
     dayDurationFilter,
     type EventFilterType,
   } from '$lib/utils/ics-event-filter';
+  import i18n from '$lib/i18n';
   import { onMount } from 'svelte';
   import { Button } from '../ui/button';
   import { InputGroupAddon, InputGroupInput } from '../ui/input-group';
@@ -32,7 +33,7 @@
     min="1"
     bind:value={dayCount}
   />
-  <InputGroupAddon align="inline-end">days</InputGroupAddon>
+  <InputGroupAddon align="inline-end">{$i18n.t('common.days')}</InputGroupAddon>
 </InputGroup>
 
 <Button
@@ -43,13 +44,13 @@
         filter: dayDurationFilter(dayCount),
       });
     }
-  }}>{isEdit ? 'Edit' : 'Add'} filter</Button
+  }}>{$i18n.t(isEdit ? 'filters.editFilter' : 'filters.addFilter')}</Button
 >
 
 {#if isEdit}
   <Button
     onclick={() => {
       onremove(filterType);
-    }}>Remove filter</Button
+    }}>{$i18n.t('filters.removeFilter')}</Button
   >
 {/if}

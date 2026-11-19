@@ -2,7 +2,8 @@
   import * as Select from '$lib/components/ui/select';
   import * as Sidebar from '$lib/components/ui/sidebar';
   import { TooltipProvider } from '$lib/components/ui/tooltip';
-  import { appStateKey } from '$lib/const';
+  import { appStateKey, langKey } from '$lib/const';
+  import i18n, { i18next } from '$lib/i18n';
   import { createAppState } from '$lib/state.svelte';
   import { initStore, restoreCalendars } from '$lib/stores/data';
   import { sidebarContent } from '$lib/stores/sidebar';
@@ -14,7 +15,7 @@
 
   initStore();
   restoreCalendars().catch((error) => {
-    console.error('Unable to load saved calendars:', error);
+    console.error($i18n.t('loadCalendarsError'), error);
   });
 
   const appState = createAppState();
@@ -30,9 +31,18 @@
     );
   });
 
-  let locale = $state<SupportedLocale>('en');
+  const localeItems: { label: string; value: string }[] = [
+    { value: 'zh-CN', label: '简体中文' },
+    { value: 'en', label: 'English' },
+  ];
+  let locale = $state<SupportedLocale>(
+    localStorage.getItem(langKey) === 'zh-CN' ? 'zh-CN' : 'en',
+  );
   $effect(() => {
     appState.locale = locale;
+    localStorage.setItem(langKey, locale);
+    document.documentElement.lang = locale;
+    void i18next.changeLanguage(locale);
   });
 </script>
 
@@ -45,25 +55,26 @@
       <div class="header">
         <div class="header-left">
           <Sidebar.Trigger />
-          <strong>ICS Gantt</strong>
+          <strong>{$i18n.t('appName')}</strong>
         </div>
 
         <div class="app-control">
           <div class="theme-switch-wrapper">
-            <label class="theme-switch">
+            <label class="theme-switch" aria-label={$i18n.t('theme')}>
               <input type="checkbox" bind:checked={isDark} />
               <div class="slider round"></div>
             </label>
           </div>
 
-          <Select.Root type="single" bind:value={locale}>
+          <Select.Root type="single" bind:value={locale} items={localeItems}>
             <Select.Trigger class="w-45">
-              <Select.Value placeholder="Theme" />
+              <Select.Value placeholder={$i18n.t('language')} />
             </Select.Trigger>
             <Select.Content>
               <Select.Group>
-                <Select.Item value="en" label="English" />
-                <Select.Item value="zh-CN" label="简体中文" />
+                {#each localeItems as { value, label } (value)}
+                  <Select.Item {value} {label} />
+                {/each}
               </Select.Group>
             </Select.Content>
           </Select.Root>

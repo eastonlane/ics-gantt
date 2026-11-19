@@ -8,6 +8,7 @@
   import * as Sidebar from '$lib/components/ui/sidebar';
   import * as Tabs from '$lib/components/ui/tabs/';
   import { getCurrentEnv } from '$lib/env';
+  import i18n from '$lib/i18n';
   import {
     addStoredCalendar,
     appCalendarStore,
@@ -114,7 +115,7 @@
 <Dialog.Root bind:open={dialogOpen}>
   <Sidebar.Root>
     <Sidebar.Group>
-      <Sidebar.GroupLabel>Calendars</Sidebar.GroupLabel>
+      <Sidebar.GroupLabel>{$i18n.t('calendar.heading')}</Sidebar.GroupLabel>
       <Sidebar.GroupAction>
         <Dialog.Trigger>
           <Plus />
@@ -151,12 +152,12 @@
                   <ContextMenu.ContextMenuItem
                     onclick={() => {
                       copyToClipBoard(restProps.url);
-                    }}>Copy URL</ContextMenu.ContextMenuItem
+                    }}>{$i18n.t('calendar.copyUrl')}</ContextMenu.ContextMenuItem
                   >
                 {/if}
                 <ContextMenu.ContextMenuItem
                   onclick={() => removeCalendar(name)}
-                  >Remove</ContextMenu.ContextMenuItem
+                  >{$i18n.t('calendar.remove')}</ContextMenu.ContextMenuItem
                 >
               </ContextMenu.Content>
             </ContextMenu.Root>
@@ -168,15 +169,15 @@
 
   <Dialog.Content>
     <Dialog.Header>
-      <Dialog.Title>Add a new calendar</Dialog.Title>
+      <Dialog.Title>{$i18n.t('calendar.addTitle')}</Dialog.Title>
     </Dialog.Header>
 
     <Tabs.Root>
       <Tabs.List>
         {#if getCurrentEnv() === 'tauri'}
-          <Tabs.Trigger value="file">File</Tabs.Trigger>
+          <Tabs.Trigger value="file">{$i18n.t('calendar.fileTab')}</Tabs.Trigger>
         {/if}
-        <Tabs.Trigger value="url">URL</Tabs.Trigger>
+        <Tabs.Trigger value="url">{$i18n.t('calendar.urlTab')}</Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value="file">
         <form
@@ -187,20 +188,20 @@
         >
           <Field.Set>
             <Field.Field>
-              <Field.Label for="name">What label</Field.Label>
+              <Field.Label for="name">{$i18n.t('calendar.nameLabel')}</Field.Label>
               <Input required name="name" type="text" />
             </Field.Field>
 
             <Field.Field>
-              <Field.Label for="files">Select your ICS file</Field.Label>
+              <Field.Label for="files">{$i18n.t('calendar.fileLabel')}</Field.Label>
               <Input name="files" required type="file" accept=".ics" />
             </Field.Field>
           </Field.Set>
           <Dialog.Footer>
-            <Button type="submit">Add</Button>
-            <Button type="reset">Reset</Button>
+            <Button type="submit">{$i18n.t('common.add')}</Button>
+            <Button type="reset">{$i18n.t('common.reset')}</Button>
             <Dialog.Close class={buttonVariants()} type="button"
-              >Cancel</Dialog.Close
+              >{$i18n.t('common.cancel')}</Dialog.Close
             >
           </Dialog.Footer>
         </form>
@@ -214,19 +215,19 @@
         >
           <Field.Set>
             <Field.Field>
-              <Field.Label for="name">Name</Field.Label>
+              <Field.Label for="name">{$i18n.t('calendar.nameLabel')}</Field.Label>
               <Input required name="name" type="text" />
             </Field.Field>
             <Field.Field>
-              <Field.Label for="url">URL</Field.Label>
+              <Field.Label for="url">{$i18n.t('calendar.urlLabel')}</Field.Label>
               <Input required name="url" type="url" />
             </Field.Field>
           </Field.Set>
           <Dialog.Footer>
-            <Button type="submit">Add</Button>
-            <Button type="reset">Reset</Button>
+            <Button type="submit">{$i18n.t('common.add')}</Button>
+            <Button type="reset">{$i18n.t('common.reset')}</Button>
             <Dialog.Close class={buttonVariants()} type="button"
-              >Cancel</Dialog.Close
+              >{$i18n.t('common.cancel')}</Dialog.Close
             >
           </Dialog.Footer>
         </form>

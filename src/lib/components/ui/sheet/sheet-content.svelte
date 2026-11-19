@@ -1,5 +1,6 @@
 <script lang="ts" module>
 	export type Side = "top" | "right" | "bottom" | "left";
+  import i18n from '$lib/i18n';
 </script>
 
 <script lang="ts">
@@ -46,7 +47,7 @@
 				{#snippet child({ props })}
 					<Button variant="ghost" class="absolute top-4 right-4" size="icon-sm" {...props}>
 						<XIcon  />
-						<span class="sr-only">Close</span>
+						<span class="sr-only">{$i18n.t('a11y.close')}</span>
 					</Button>
 				{/snippet}
 			</SheetPrimitive.Close>

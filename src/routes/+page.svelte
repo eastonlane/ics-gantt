@@ -11,6 +11,7 @@
   import Button from '$lib/components/ui/button/button.svelte';
   import * as Select from '$lib/components/ui/select';
   import { appStateKey } from '$lib/const';
+  import i18n from '$lib/i18n';
   import type { createAppState } from '$lib/state.svelte';
   import { appCalendarStore } from '$lib/stores/data';
   import { sidebarContent } from '$lib/stores/sidebar';
@@ -59,13 +60,13 @@
       .reduce((cur, val) => cur.add(val), new Set<string>()),
   ]);
 
-  const filterTypeItems = [
-    { value: 'recent', label: 'Recent' },
-    { value: 'duration', label: 'Duration' },
-    { value: 'range', label: 'Date Range' },
-    { value: 'blacklist', label: 'Categories Blacklist' },
-    { value: 'whitelist', label: 'Categories Whitelist' },
-  ];
+  const filterTypeItems = $derived([
+    { value: 'recent', label: $i18n.t('filters.recent') },
+    { value: 'duration', label: $i18n.t('filters.duration') },
+    { value: 'range', label: $i18n.t('filters.range') },
+    { value: 'blacklist', label: $i18n.t('filters.blacklist') },
+    { value: 'whitelist', label: $i18n.t('filters.whitelist') },
+  ]);
   let selectedFilterType = $state<EventFilterType>();
   let filters = $state<EventFilterWithId[]>([]);
   function appendFilter(f: EventFilterWithId) {
@@ -90,7 +91,7 @@
           items={filterTypeItems}
         >
           <Select.Trigger class="w-45">
-            <Select.Value placeholder="Filter" />
+            <Select.Value placeholder={$i18n.t('filters.placeholder')} />
           </Select.Trigger>
           <Select.Content>
             <Select.Group>
@@ -103,7 +104,7 @@
           </Select.Content>
         </Select.Root>
         <Button disabled={!filters?.length} onclick={() => (filters = [])}
-          >Reset Filters</Button
+          >{$i18n.t('filters.resetFilters')}</Button
         >
         {#if selectedFilterType === 'recent'}
           <EventRecentFilterComp
