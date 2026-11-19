@@ -1,4 +1,8 @@
-import type { IcsEventBase } from 'ts-ics';
 import type { ITask } from '@svar-ui/svelte-gantt';
 
-export type AppTask = ITask & { categories: typeof IcsEventBase.categories };
+interface AppTaskExt {
+  description?: string;
+  categories: typeof IcsEventBase.categories;
+}
+
+export type AppTask = ITask & AppTaskExt;

@@ -39,6 +39,7 @@
       type: 'task',
       lazy: false,
       categories: ev.categories,
+      description: ev.description,
     })),
   );
   let scales = $derived([

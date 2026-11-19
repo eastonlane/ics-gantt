@@ -70,6 +70,7 @@ const en = {
       remainingDays_other: '{{count}} days',
       remainingHours_one: '{{count}} hour',
       remainingHours_other: '{{count}} hours',
+      description: 'Description',
     },
   },
 } as const;

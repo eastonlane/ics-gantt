@@ -68,6 +68,7 @@ const zhCN = {
       lessThanOneHour: '不足一小时',
       remainingDays_other: '{{count}} 天',
       remainingHours_other: '{{count}} 小时',
+      description: '描述',
     },
   },
 } as const;

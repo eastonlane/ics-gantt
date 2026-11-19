@@ -37,7 +37,7 @@
 {#snippet row(label: string, value: string | undefined)}
   <div class="wx-row">
     <span class="wx-label">{label}:</span>
-    <span class="wx-value">{value}</span>
+    <p class="font-semifold max-w-[400px] break-words">{value}</p>
   </div>
 {/snippet}
 
@@ -57,6 +57,9 @@
         $i18n.t('chart.tooltip.remainingTime'),
         getRemainingTime(task.end),
       )}
+    {/if}
+    {#if task.description?.length}
+      {@render row($i18n.t('chart.tooltip.description'), task.description)}
     {/if}
   </div>
 {/if}
@@ -82,9 +85,5 @@
 
   .wx-label {
     font-weight: normal;
-  }
-
-  .wx-value {
-    font-weight: 600;
   }
 </style>
