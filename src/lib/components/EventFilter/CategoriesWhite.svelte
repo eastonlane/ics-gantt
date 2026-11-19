@@ -3,6 +3,8 @@
   import i18n from '$lib/i18n';
   import {
     categoriesWhiteFilter,
+    newEventFilterScopeSingle,
+    type CalendarIdType,
     type EventFilterType,
   } from '$lib/utils/ics-event-filter';
   import { Button } from '../ui/button';
@@ -14,11 +16,17 @@
     onremove,
     categories,
     isEdit,
-    defaultCategories,
-  }: Props & { categories: string[]; defaultCategories?: string[] } = $props();
+    defaultValue: defaultCategories,
+    calendarId,
+  }: Props & {
+    categories: string[];
+    defaultValue?: string[];
+    calendarId: CalendarIdType;
+  } = $props();
 
   // svelte-ignore state_referenced_locally
   let seletedCategories = $state<string[]>(defaultCategories ?? []);
+  let isAddable = $derived(!!seletedCategories?.length);
 
   function resetInput() {
     seletedCategories = [];
@@ -40,12 +48,10 @@
   </Select.Content>
 </Select.Root>
 <Button
+  disabled={!isAddable}
   onclick={() => {
-    if (seletedCategories) {
-      onadd({
-        type: filterType,
-        filter: categoriesWhiteFilter(seletedCategories),
-      });
+    if (isAddable) {
+      onadd(categoriesWhiteFilter(seletedCategories, calendarId));
       resetInput();
     }
   }}>{$i18n.t(isEdit ? 'filters.editFilter' : 'filters.addFilter')}</Button
@@ -53,7 +59,10 @@
 {#if isEdit}
   <Button
     onclick={() => {
-      onremove(filterType);
+      onremove({
+        type: filterType,
+        scope: newEventFilterScopeSingle(calendarId),
+      });
     }}>{$i18n.t('filters.removeFilter')}</Button
   >
 {/if}

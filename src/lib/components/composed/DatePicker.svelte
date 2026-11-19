@@ -36,7 +36,9 @@
         {...props}
       >
         <CalendarIcon class="me-2 size-4" />
-        {value ? df.format(value.toDate(getLocalTimeZone())) : $i18n.t('common.selectDate')}
+        {value
+          ? df.format(value.toDate(getLocalTimeZone()))
+          : $i18n.t('common.selectDate')}
       </Button>
     {/snippet}
   </Popover.Trigger>
