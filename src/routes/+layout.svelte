@@ -31,6 +31,10 @@
     );
   });
 
+  const localeItems: { label: string; value: string }[] = [
+    { value: 'zh-CN', label: '简体中文' },
+    { value: 'en', label: 'English' },
+  ];
   let locale = $state<SupportedLocale>(
     localStorage.getItem(langKey) === 'zh-CN' ? 'zh-CN' : 'en',
   );
@@ -62,14 +66,15 @@
             </label>
           </div>
 
-          <Select.Root type="single" bind:value={locale}>
+          <Select.Root type="single" bind:value={locale} items={localeItems}>
             <Select.Trigger class="w-45">
               <Select.Value placeholder={$i18n.t('language')} />
             </Select.Trigger>
             <Select.Content>
               <Select.Group>
-                <Select.Item value="en" label="English" />
-                <Select.Item value="zh-CN" label="简体中文" />
+                {#each localeItems as { value, label } (value)}
+                  <Select.Item {value} {label} />
+                {/each}
               </Select.Group>
             </Select.Content>
           </Select.Root>
