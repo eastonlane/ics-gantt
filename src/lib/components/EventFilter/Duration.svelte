@@ -1,9 +1,9 @@
 <script lang="ts">
   import i18n from '$lib/i18n';
+  import type { EventFilterType } from '$lib/types/ics-event-filter';
   import {
     dayDurationFilter,
     newEventFilterScopeAll,
-    type EventFilterType,
   } from '$lib/utils/ics-event-filter';
   import { Button } from '../ui/button';
   import { InputGroupAddon, InputGroupInput } from '../ui/input-group';

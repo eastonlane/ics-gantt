@@ -16,16 +16,19 @@
   import { appCalendarStore } from '$lib/stores/data';
   import type { AppIcsCalendar } from '$lib/stores/model';
   import { sidebarContent } from '$lib/stores/sidebar';
+  import type {
+    CalendarIdType,
+    EventFilter,
+    EventFilterIndentity,
+    EventFilterType,
+  } from '$lib/types/ics-event-filter';
   import {
     isFilterApplicable,
     isSameFilter,
     newEventFilterScopeAll,
     newEventFilterScopeSingle,
-    type CalendarIdType,
-    type EventFilter,
-    type EventFilterIndentity,
-    type EventFilterType,
   } from '$lib/utils/ics-event-filter';
+
   import { getContext, onMount } from 'svelte';
 
   let appState = getContext<ReturnType<typeof createAppState>>(appStateKey);
