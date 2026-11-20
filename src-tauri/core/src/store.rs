@@ -2,9 +2,10 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
-use crate::model::{CalendarType, managed_ics_path};
+use crate::model::CalendarType;
 
-const STORE_FILE_NAME: &str = "calendar.json";
+const STORE_FILE_NAME: &str = "calendars.json";
+const STORE_ICS_FILE_MANAGE_DIR_NAME: &str = "calendars";
 
 #[derive(Debug, Clone)]
 pub struct CalendarStore {
@@ -20,6 +21,13 @@ impl CalendarStore {
 
     pub fn store_file_path(&self) -> PathBuf {
         self.data_path_root.join(STORE_FILE_NAME)
+    }
+
+    pub fn reset(&self) -> Result<(), StoreError> {
+        fs::remove_file(self.store_file_path()).map_err(StoreError::Io)?;
+        fs::remove_dir_all(self.data_path_root.join(STORE_ICS_FILE_MANAGE_DIR_NAME))
+            .map_err(StoreError::Io)?;
+        Ok(())
     }
 
     pub fn read(&self) -> Result<Vec<CalendarType>, StoreError> {
@@ -51,7 +59,11 @@ impl CalendarStore {
         Ok(calendars)
     }
 
-    pub fn update(&self, name: String, calendar: &CalendarType) -> Result<Vec<CalendarType>, StoreError> {
+    pub fn update(
+        &self,
+        name: &String,
+        calendar: &CalendarType,
+    ) -> Result<Vec<CalendarType>, StoreError> {
         let mut calendars = self.read()?;
         for cal in calendars.iter_mut() {
             if cal.name() == name {
@@ -98,6 +110,14 @@ impl CalendarStore {
         }
         fs::read(target).map_err(StoreError::Io)
     }
+
+    pub fn remove_ics(&self, name: &str) -> Result<(), StoreError> {
+        let path = managed_ics_path(&self.data_path_root, name);
+        if fs::exists(path.clone()).map_err(StoreError::Io)? {
+            fs::remove_file(path).map_err(StoreError::Io)?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Debug)]
@@ -131,4 +151,27 @@ impl std::error::Error for StoreError {
             Self::InvalidPath(_) => None,
         }
     }
+}
+
+pub fn safe_filename(name: &str) -> String {
+    let sanitized: String = name
+        .chars()
+        .map(|character| match character {
+            '/' | '\\' | ':' | '*' | '?' | '"' | '<' | '>' | '|' => '_',
+            other => other,
+        })
+        .collect();
+    let trimmed = sanitized.trim().trim_matches('.').trim();
+    if trimmed.is_empty() {
+        "calendar.ics".to_owned()
+    } else if trimmed.to_ascii_lowercase().ends_with(".ics") {
+        trimmed.to_owned()
+    } else {
+        format!("{trimmed}.ics")
+    }
+}
+
+pub fn managed_ics_path(root: &Path, name: &str) -> PathBuf {
+    root.join(STORE_ICS_FILE_MANAGE_DIR_NAME)
+        .join(safe_filename(name))
 }
