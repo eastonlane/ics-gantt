@@ -1,9 +1,9 @@
 <script lang="ts">
   import i18n from '$lib/i18n';
+  import type { EventFilterType } from '$lib/types/ics-event-filter';
   import {
     newEventFilterScopeAll,
-    recentFilter,
-    type EventFilterType,
+    recentDaysFilter,
   } from '$lib/utils/ics-event-filter';
   import { Button } from '../ui/button';
   import {
@@ -37,7 +37,7 @@
 <Button
   onclick={() => {
     if (dayCount) {
-      onadd(recentFilter(dayCount));
+      onadd(recentDaysFilter(dayCount));
     }
   }}>{$i18n.t(isEdit ? 'filters.editFilter' : 'filters.addFilter')}</Button
 >

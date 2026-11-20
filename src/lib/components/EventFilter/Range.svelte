@@ -1,10 +1,10 @@
 <script lang="ts">
   import * as Tooltip from '$lib/components/ui/tooltip';
   import i18n from '$lib/i18n';
+  import type { EventFilterType } from '$lib/types/ics-event-filter';
   import {
     dateRangeFilter,
     newEventFilterScopeAll,
-    type EventFilterType,
   } from '$lib/utils/ics-event-filter';
   import { type DateValue } from '@internationalized/date';
   import DatePicker from '../composed/DatePicker.svelte';
