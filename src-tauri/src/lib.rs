@@ -13,7 +13,14 @@ fn service(app: &tauri::AppHandle) -> Result<service::CalendarService, String> {
 fn data_directory(app: &tauri::AppHandle) -> Result<std::path::PathBuf, String> {
     app.path()
         .app_data_dir()
-        .map(|path| path.join(service::APP_DATA_DIRECTORY))
+        .map(|path| path.join(service::DATA_DIR_NAME))
+        .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+fn reset_store(app: tauri::AppHandle) -> Result<(), String> {
+    service(&app)?
+        .reset()
         .map_err(|error| error.to_string())
 }
 
@@ -25,12 +32,19 @@ fn list_calendars(app: tauri::AppHandle) -> Result<Vec<model::CalendarType>, Str
 }
 
 #[tauri::command]
-fn add_calendar(
+async fn add_calendar(
     app: tauri::AppHandle,
     calendar: model::CalendarType,
 ) -> Result<Vec<model::CalendarType>, String> {
     service(&app)?
-        .add_calendar(calendar)
+        .add_calendar(calendar).await
+        .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn sync_calendar(app: tauri::AppHandle, name: String) -> Result<Vec<u8>, String> {
+    service(&app)?
+        .sync_calendar(name).await
         .map_err(|error| error.to_string())
 }
 
@@ -41,7 +55,7 @@ fn update_calendar(
     calendar: model::CalendarType
 ) -> Result<Vec<model::CalendarType>, String> {
     service(&app)?
-        .update_calendar(name, calendar)
+        .update_calendar(&name, &calendar)
         .map_err(|error| error.to_string())
 }
 
@@ -79,8 +93,10 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
+            reset_store,
             list_calendars,
             add_calendar,
+            sync_calendar,
             update_calendar,
             remove_calendar,
             save_ics_file,

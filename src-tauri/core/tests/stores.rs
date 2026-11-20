@@ -1,9 +1,7 @@
 use tempfile::tempdir;
 
-use ics_gantt_core::model::{
-    CalendarType, FileCalendarStoreType, UrlCalendarStoreType, safe_filename,
-};
-use ics_gantt_core::store::CalendarStore;
+use ics_gantt_core::model::{CalendarType, FileCalendarStoreType, UrlCalendarStoreType};
+use ics_gantt_core::store::{CalendarStore, safe_filename};
 
 fn file_calendar(name: &str, created: i64) -> CalendarType {
     CalendarType::File(FileCalendarStoreType {
