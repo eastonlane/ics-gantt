@@ -2,9 +2,11 @@ use tempfile::tempdir;
 
 use ics_gantt_core::model::{CalendarType, FileCalendarStoreType, UrlCalendarStoreType};
 use ics_gantt_core::store::{CalendarStore, safe_filename};
+use uuid::Uuid;
 
 fn file_calendar(name: &str, created: i64) -> CalendarType {
     CalendarType::File(FileCalendarStoreType {
+        id: Uuid::now_v7().to_string(),
         name: name.to_owned(),
         path: format!("/calendar/{name}.ics"),
         created,
@@ -13,6 +15,7 @@ fn file_calendar(name: &str, created: i64) -> CalendarType {
 
 fn url_calendar(name: &str, created: i64) -> CalendarType {
     CalendarType::Url(UrlCalendarStoreType {
+        id: Uuid::now_v7().to_string(),
         name: name.to_owned(),
         path: format!("/calendar/{name}.ics"),
         url: format!("https://example.com/{name}.ics"),
@@ -49,7 +52,7 @@ fn removes_a_calendar_by_name() {
     let remove = url_calendar("remove", 2);
     store.save(&keep).unwrap();
     store.save(&remove).unwrap();
-    assert_eq!(store.remove_named("remove").unwrap(), vec![keep]);
+    assert_eq!(store.remove_calendar("remove").unwrap(), vec![keep]);
 }
 
 #[test]

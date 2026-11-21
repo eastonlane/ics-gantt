@@ -48,8 +48,8 @@
     dialogOpen = false;
   }
 
-  function updateHidden(name: string, isVisiblePrev?: boolean) {
-    singleSelectedCalendar = isVisiblePrev ? undefined : name;
+  function updateHidden(id: string, isVisiblePrev?: boolean) {
+    singleSelectedCalendar = isVisiblePrev ? undefined : id;
   }
 
   function removeCalendar(name: string) {
@@ -77,14 +77,6 @@
       created: Math.floor(created.getTime() / 1000),
     };
     await addStoredCalendar(stored);
-    appCalendarStore.update((s) => [
-      ...s,
-      {
-        ...stored,
-        icsCalendar,
-        created,
-      },
-    ]);
     closeDialog();
   }
 
@@ -122,8 +114,8 @@
         </Dialog.Trigger>
       </Sidebar.GroupAction>
       <Sidebar.Menu>
-        {#each $appCalendarStore as { name, icsCalendar, ...restProps } (`${name} ${icsCalendar.name}`)}
-          {@const isVisible = !!selectedCalendarList.find((x) => x === name)}
+        {#each $appCalendarStore as { id, name, icsCalendar, ...restProps } (id)}
+          {@const isVisible = !!selectedCalendarList.find((x) => x === id)}
           <Sidebar.MenuSub>
             <!-- <Sidebar.GroupAction /> -->
             <ContextMenu.Root>
@@ -136,7 +128,7 @@
                     <Button
                       variant="ghost"
                       size="icon"
-                      onclick={() => updateHidden(name, isVisible)}
+                      onclick={() => updateHidden(id, isVisible)}
                     >
                       {#if isVisible}
                         <Eye />
@@ -152,7 +144,8 @@
                   <ContextMenu.ContextMenuItem
                     onclick={() => {
                       copyToClipBoard(restProps.url);
-                    }}>{$i18n.t('calendar.copyUrl')}</ContextMenu.ContextMenuItem
+                    }}
+                    >{$i18n.t('calendar.copyUrl')}</ContextMenu.ContextMenuItem
                   >
                 {/if}
                 <ContextMenu.ContextMenuItem
@@ -174,10 +167,11 @@
 
     <Tabs.Root>
       <Tabs.List>
-        {#if getCurrentEnv() === 'tauri'}
-          <Tabs.Trigger value="file">{$i18n.t('calendar.fileTab')}</Tabs.Trigger>
-        {/if}
         <Tabs.Trigger value="url">{$i18n.t('calendar.urlTab')}</Tabs.Trigger>
+        {#if getCurrentEnv() === 'tauri'}
+          <Tabs.Trigger value="file">{$i18n.t('calendar.fileTab')}</Tabs.Trigger
+          >
+        {/if}
       </Tabs.List>
       <Tabs.Content value="file">
         <form
@@ -188,12 +182,16 @@
         >
           <Field.Set>
             <Field.Field>
-              <Field.Label for="name">{$i18n.t('calendar.nameLabel')}</Field.Label>
+              <Field.Label for="name"
+                >{$i18n.t('calendar.nameLabel')}</Field.Label
+              >
               <Input required name="name" type="text" />
             </Field.Field>
 
             <Field.Field>
-              <Field.Label for="files">{$i18n.t('calendar.fileLabel')}</Field.Label>
+              <Field.Label for="files"
+                >{$i18n.t('calendar.fileLabel')}</Field.Label
+              >
               <Input name="files" required type="file" accept=".ics" />
             </Field.Field>
           </Field.Set>
@@ -215,11 +213,14 @@
         >
           <Field.Set>
             <Field.Field>
-              <Field.Label for="name">{$i18n.t('calendar.nameLabel')}</Field.Label>
+              <Field.Label for="name"
+                >{$i18n.t('calendar.nameLabel')}</Field.Label
+              >
               <Input required name="name" type="text" />
             </Field.Field>
             <Field.Field>
-              <Field.Label for="url">{$i18n.t('calendar.urlLabel')}</Field.Label>
+              <Field.Label for="url">{$i18n.t('calendar.urlLabel')}</Field.Label
+              >
               <Input required name="url" type="url" />
             </Field.Field>
           </Field.Set>

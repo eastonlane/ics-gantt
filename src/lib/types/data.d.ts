@@ -1,9 +1,16 @@
 import { type IcsCalendar } from 'ts-ics';
 
-export interface BaseFileCalendar {
-  type: 'file';
+export type CalendarType = 'url' | 'file';
+
+export interface BaseCalendar {
+  id: string;
   name: string;
   path: string;
+  type: CalendarType;
+}
+
+export interface BaseFileCalendar extends BaseCalendar {
+  type: 'file';
 }
 
 export interface AppFileCalendar extends BaseFileCalendar {
@@ -15,10 +22,8 @@ export interface AppFileCalendar extends BaseFileCalendar {
 export interface StoredFileCalendar extends BaseFileCalendar {
   created: number;
 }
-export interface BaseUrlCalendar {
+export interface BaseUrlCalendar extends BaseCalendar {
   type: 'url';
-  path: string;
-  name: string;
   url: string;
 }
 
@@ -37,3 +42,7 @@ export interface StoredUrlCalendar extends BaseUrlCalendar {
 export type BaseCalendar = BaseFileCalendar | BaseUrlCalendar;
 export type AppIcsCalendar = AppFileCalendar | AppUrlCalendar;
 export type StoredCalendar = StoredFileCalendar | StoredUrlCalendar;
+
+type StoredCalendarInput =
+  | (Omit<StoredFileCalendar, 'id'> & { id?: string })
+  | (Omit<StoredUrlCalendar, 'id'> & { id?: string });

@@ -1,5 +1,9 @@
+import type { BaseCalendar, StoredCalendar } from '$lib/types/data';
 import { invoke } from '@tauri-apps/api/core';
-import type { BaseCalendar, StoredCalendar } from './model';
+
+export async function resetStore(): Promise<void> {
+  return invoke<void>('reset_store');
+}
 
 export function addStoredCalendar(
   calendar: StoredCalendar,
@@ -9,18 +13,18 @@ export function addStoredCalendar(
   });
 }
 
-export function removeStoredCalendar(name: string): Promise<StoredCalendar[]> {
+export function removeStoredCalendar(id: string): Promise<StoredCalendar[]> {
   return invoke<StoredCalendar[]>('remove_calendar', {
-    name,
+    id,
   });
 }
 
 export async function updateStoredCalendar(
-  name: string,
+  id: string,
   value: BaseCalendar,
 ): Promise<StoredCalendar[]> {
   return invoke<StoredCalendar[]>('update_calendar', {
-    name,
+    id,
     calendar: value,
   });
 }
@@ -30,11 +34,11 @@ export function loadStoredCalendars(): Promise<StoredCalendar[]> {
 }
 
 export async function saveIcsContents(
-  name: string,
+  id: string,
   contents: ArrayBuffer,
 ): Promise<string> {
   return invoke<string>('save_ics_file', {
-    name,
+    id,
     contents: Array.from(new Uint8Array(contents)),
   });
 }

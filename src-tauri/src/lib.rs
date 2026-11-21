@@ -19,9 +19,7 @@ fn data_directory(app: &tauri::AppHandle) -> Result<std::path::PathBuf, String> 
 
 #[tauri::command]
 fn reset_store(app: tauri::AppHandle) -> Result<(), String> {
-    service(&app)?
-        .reset()
-        .map_err(|error| error.to_string())
+    service(&app)?.reset().map_err(|error| error.to_string())
 }
 
 #[tauri::command]
@@ -37,42 +35,41 @@ async fn add_calendar(
     calendar: model::CalendarType,
 ) -> Result<Vec<model::CalendarType>, String> {
     service(&app)?
-        .add_calendar(calendar).await
+        .add_calendar(calendar)
+        .await
         .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
-async fn sync_calendar(app: tauri::AppHandle, name: String) -> Result<Vec<u8>, String> {
+async fn sync_calendar(app: tauri::AppHandle, id: String) -> Result<Vec<u8>, String> {
     service(&app)?
-        .sync_calendar(name).await
+        .sync_calendar(id)
+        .await
         .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
 fn update_calendar(
     app: tauri::AppHandle,
-    name: String,
-    calendar: model::CalendarType
+    id: String,
+    calendar: model::CalendarType,
 ) -> Result<Vec<model::CalendarType>, String> {
     service(&app)?
-        .update_calendar(&name, &calendar)
+        .update_calendar(&id, &calendar)
         .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
-fn remove_calendar(
-    app: tauri::AppHandle,
-    name: String,
-) -> Result<Vec<model::CalendarType>, String> {
+fn remove_calendar(app: tauri::AppHandle, id: String) -> Result<Vec<model::CalendarType>, String> {
     service(&app)?
-        .remove_calendar(&name)
+        .remove_calendar(&id)
         .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
-fn save_ics_file(app: tauri::AppHandle, name: String, contents: Vec<u8>) -> Result<String, String> {
+fn save_ics_file(app: tauri::AppHandle, id: String, contents: Vec<u8>) -> Result<String, String> {
     service(&app)?
-        .save_ics(&name, &contents)
+        .save_ics(&id, &contents)
         .map_err(|error| error.to_string())
 }
 
@@ -92,6 +89,7 @@ fn get_data_directory(app: tauri::AppHandle) -> Result<String, String> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_uuid::init())
         .invoke_handler(tauri::generate_handler![
             reset_store,
             list_calendars,

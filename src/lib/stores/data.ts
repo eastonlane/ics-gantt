@@ -1,9 +1,17 @@
+//TODO: all these operation need error check
 import { getCurrentEnv } from '$lib/env';
+import type {
+  AppIcsCalendar,
+  BaseCalendar,
+  StoredCalendar,
+  StoredCalendarInput,
+} from '$lib/types/data';
+import * as uuidTauri from '@marrionesa/plugin-uuid';
 import { writable } from 'svelte/store';
 import { convertIcsCalendar } from 'ts-ics';
+import * as uuidWeb from 'uuid';
 import * as tauri from './data-tauri';
 import * as web from './data-web';
-import type { AppIcsCalendar, BaseCalendar, StoredCalendar } from './model';
 
 export const storedCalendarStore = writable<StoredCalendar[]>([]);
 export const appCalendarStore = writable<AppIcsCalendar[]>([]); // TODO: lazy load ics calendar
@@ -32,13 +40,27 @@ export function initStore() {
 }
 
 /**
+ * Reset the store data, including the calendar metadata and managed ICS file(tauri mode).
+ * @returns nothing
+ */
+export async function resetStore(): Promise<void> {
+  switch (getCurrentEnv()) {
+    case 'tauri':
+      return await tauri.resetStore();
+    case 'web':
+      return web.resetStore();
+  }
+}
+
+/**
  * add a new calendar to the store
- * @param calendar the calendare to added
+ * @param input the calendare to added, allow no calendar id
  * @returns the stored calendar list after this action
  */
 export async function addStoredCalendar(
-  calendar: StoredCalendar,
+  input: StoredCalendarInput,
 ): Promise<StoredCalendar[]> {
+  const calendar = await ensureCalendarId(input);
   let result: StoredCalendar[] = [];
   switch (getCurrentEnv()) {
     case 'tauri':
@@ -53,16 +75,16 @@ export async function addStoredCalendar(
 }
 
 export async function updateStoredCalendar(
-  name: string,
+  id: string,
   value: BaseCalendar,
 ): Promise<StoredCalendar[]> {
   let result: StoredCalendar[] = [];
   switch (getCurrentEnv()) {
     case 'tauri':
-      result = await tauri.updateStoredCalendar(name, value);
+      result = await tauri.updateStoredCalendar(id, value);
       break;
     case 'web':
-      result = web.updateStoredCalendar(name, value);
+      result = web.updateStoredCalendar(id, value);
       break;
   }
   storedCalendarStore.set(result);
@@ -70,20 +92,20 @@ export async function updateStoredCalendar(
 }
 
 /**
- * Remove a calendar with the given name
- * @param name The name of the calendar to remove
+ * Remove a calendar with the given id
+ * @param id The id of the calendar to remove
  * @returns The stored calendar list after remove
  */
 export async function removeStoredCalendar(
-  name: string,
+  id: string,
 ): Promise<StoredCalendar[]> {
   let result: StoredCalendar[] = [];
   switch (getCurrentEnv()) {
     case 'tauri':
-      result = await tauri.removeStoredCalendar(name);
+      result = await tauri.removeStoredCalendar(id);
       break;
     case 'web':
-      result = web.removeStoredCalendar(name);
+      result = web.removeStoredCalendar(id);
       break;
   }
   storedCalendarStore.set(result);
@@ -112,17 +134,17 @@ export async function loadStoredCalendars(): Promise<StoredCalendar[]> {
 
 /**
  * Only for file calendar in `tauri` env. Persist the ICS file content.
- * @param name The calendar name
+ * @param id The calendar id
  * @param contents The calendar contents
  * @returns the path where the ICS file is stored in the device.
  */
 export function saveIcsContents(
-  name: string,
+  id: string,
   contents: ArrayBuffer,
 ): Promise<string> {
   switch (getCurrentEnv()) {
     case 'tauri':
-      return tauri.saveIcsContents(name, contents);
+      return tauri.saveIcsContents(id, contents);
     case 'web':
       throw new Error("web mode doesn't support local calendar");
   }
@@ -160,14 +182,33 @@ export async function restoreCalendars(): Promise<StoredCalendar[]> {
 }
 
 export async function updateCalendarsVisibility(
-  visiableCalendarName: string[],
+  visiableCalendarIdList: string[],
 ) {
   appCalendarStore.update((it) =>
     it.map(
       (calendar) =>
-        (visiableCalendarName.find((x) => x === calendar.name)
+        (visiableCalendarIdList.find((x) => x === calendar.id)
           ? { ...calendar, isVisible: true }
           : { ...calendar, isVisible: false }) as AppIcsCalendar,
     ),
   );
+}
+
+async function newCalendarId(): Promise<string> {
+  switch (getCurrentEnv()) {
+    case 'tauri':
+      return await uuidTauri.v7();
+    case 'web':
+      return uuidWeb.v7();
+  }
+}
+
+async function ensureCalendarId(
+  calendar: StoredCalendarInput,
+): Promise<StoredCalendar> {
+  const id = calendar.id?.length ? calendar.id : await newCalendarId();
+  return {
+    ...calendar,
+    id,
+  };
 }
