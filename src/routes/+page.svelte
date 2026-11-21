@@ -167,7 +167,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    min-height: 100vh;
+    min-height: 0;
     height: 100%;
     overflow: hidden;
     padding: 1vh 2vw 24px;
@@ -178,7 +178,7 @@
   }
 
   .gantt-wrapper {
-    min-height: 100vh;
+    min-height: 0;
     height: 100%;
     min-width: 0;
     width: 100%;

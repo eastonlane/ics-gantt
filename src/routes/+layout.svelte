@@ -46,7 +46,7 @@
   });
 </script>
 
-<Sidebar.Provider>
+<Sidebar.Provider class="h-svh max-h-svh">
   {#if $sidebarContent}
     {@render $sidebarContent()}
   {/if}
