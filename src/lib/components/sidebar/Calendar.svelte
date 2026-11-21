@@ -77,14 +77,6 @@
       created: Math.floor(created.getTime() / 1000),
     };
     await addStoredCalendar(stored);
-    appCalendarStore.update((s) => [
-      ...s,
-      {
-        ...stored,
-        icsCalendar,
-        created,
-      },
-    ]);
     closeDialog();
   }
 
