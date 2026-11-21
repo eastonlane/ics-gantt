@@ -10,7 +10,19 @@
     "plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"]
   },
 
+  "lsp": {
+    "rust-analyzer": {
+      "initialization_options": {
+        "linkedProjects": ["./src-tauri/Cargo.toml"]
+      }
+    }
+  },
+
   "languages": {
+    "Rust": {
+      "formatter": "language_server",
+      "format_on_save": "on"
+    },
     "Svelte": {
       "language_servers": ["svelte-language-server"],
       "prettier": {
