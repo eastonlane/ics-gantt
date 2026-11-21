@@ -1,5 +1,5 @@
+import type { BaseCalendar, StoredCalendar } from '$lib/types/data';
 import { invoke } from '@tauri-apps/api/core';
-import type { BaseCalendar, StoredCalendar } from './model';
 
 export function addStoredCalendar(
   calendar: StoredCalendar,

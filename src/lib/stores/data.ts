@@ -1,9 +1,14 @@
 import { getCurrentEnv } from '$lib/env';
+import type {
+  AppIcsCalendar,
+  BaseCalendar,
+  StoredCalendar,
+  StoredCalendarInput,
+} from '$lib/types/data';
 import { writable } from 'svelte/store';
 import { convertIcsCalendar } from 'ts-ics';
 import * as tauri from './data-tauri';
 import * as web from './data-web';
-import type { AppIcsCalendar, BaseCalendar, StoredCalendar } from './model';
 
 export const storedCalendarStore = writable<StoredCalendar[]>([]);
 export const appCalendarStore = writable<AppIcsCalendar[]>([]); // TODO: lazy load ics calendar

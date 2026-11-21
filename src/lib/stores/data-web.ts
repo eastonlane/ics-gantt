@@ -1,5 +1,5 @@
 import * as webapi from '$lib/api/http-web';
-import type { BaseCalendar, StoredCalendar } from './model';
+import type { BaseCalendar, StoredCalendar } from '$lib/types/data';
 
 const calendarStorageKey = 'calendars';
 
