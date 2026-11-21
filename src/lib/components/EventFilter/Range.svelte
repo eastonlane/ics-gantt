@@ -1,20 +1,30 @@
 <script lang="ts">
   import * as Tooltip from '$lib/components/ui/tooltip';
   import i18n from '$lib/i18n';
+  import type { EventFilterType } from '$lib/types/ics-event-filter';
   import {
-    rangeFilter,
-    type EventFilterType,
+    dateRangeFilter,
+    newEventFilterScopeAll,
   } from '$lib/utils/ics-event-filter';
-  import { getLocalTimeZone, type DateValue } from '@internationalized/date';
+  import { type DateValue } from '@internationalized/date';
   import DatePicker from '../composed/DatePicker.svelte';
   import { Button } from '../ui/button';
   import type { Props } from './props';
 
   const filterType: EventFilterType = 'range';
-  let { onadd, onremove, isEdit, locale }: Props = $props();
+  let {
+    onadd,
+    onremove,
+    isEdit,
+    locale,
+    defaultStart,
+    defaultEnd,
+  }: Props & { defaultStart?: DateValue; defaultEnd?: DateValue } = $props();
 
-  let startDate = $state<DateValue>();
-  let endDate = $state<DateValue>();
+  // svelte-ignore state_referenced_locally
+  let startDate = $state(defaultStart);
+  // svelte-ignore state_referenced_locally
+  let endDate = $state(defaultEnd);
 
   let confirmDisableReason = $derived.by<string>(() => {
     if (!startDate && !endDate) {
@@ -28,18 +38,12 @@
   let isConfirmDisabled = $derived(!!confirmDisableReason?.length);
 
   function confirmFilter() {
-    const filter = rangeFilter(
-      startDate?.toDate(getLocalTimeZone()),
-      endDate?.toDate(getLocalTimeZone()),
-    );
+    const filter = dateRangeFilter(startDate, endDate);
     if (!filter) {
       // TODO: toast the error
       throw new Error($i18n.t('filters.invalidRangeError'));
     }
-    onadd({
-      type: filterType,
-      filter,
-    });
+    onadd(filter);
   }
 </script>
 
@@ -70,7 +74,7 @@
 {#if isEdit}
   <Button
     onclick={() => {
-      onremove(filterType);
+      onremove({ type: filterType, scope: newEventFilterScopeAll() });
     }}>{$i18n.t('filters.removeFilter')}</Button
   >
 {/if}

@@ -14,13 +14,22 @@
   import i18n from '$lib/i18n';
   import type { createAppState } from '$lib/state.svelte';
   import { appCalendarStore } from '$lib/stores/data';
+  import type { AppIcsCalendar } from '$lib/stores/model';
   import { sidebarContent } from '$lib/stores/sidebar';
   import type {
+    CalendarIdType,
+    EventFilter,
+    EventFilterIndentity,
     EventFilterType,
-    EventFilterWithId,
+  } from '$lib/types/ics-event-filter';
+  import {
+    isFilterApplicable,
+    isSameFilter,
+    newEventFilterScopeAll,
+    newEventFilterScopeSingle,
   } from '$lib/utils/ics-event-filter';
+
   import { getContext, onMount } from 'svelte';
-  import { type IcsCalendar } from 'ts-ics';
 
   let appState = getContext<ReturnType<typeof createAppState>>(appStateKey);
   let locale = $derived(appState.locale);
@@ -32,7 +41,7 @@
     };
   });
 
-  let icsCalendar = $derived.by<IcsCalendar | null>(() => {
+  let appCalendar = $derived.by<AppIcsCalendar | null>(() => {
     if (!$appCalendarStore.length) {
       return null;
     }
@@ -40,8 +49,10 @@
     if (!item) {
       return null;
     }
-    return item.icsCalendar;
+    return item;
   });
+  let icsCalendar = $derived(appCalendar?.icsCalendar);
+  let calendarId = $derived(appCalendar?.name);
   let icsEvents = $derived(
     (icsCalendar?.events ?? []).filter((x) =>
       x.end ? x.end >= x.start : true,
@@ -50,7 +61,9 @@
   let events = $derived(
     icsEvents.filter(
       (x) =>
-        filters.values().reduce((cur, f) => cur && f.filter(x), true) ?? true,
+        filtersInScope
+          .values()
+          .reduce((cur, f) => cur && f.filterFunc(x), true) ?? true,
     ),
   );
 
@@ -68,12 +81,38 @@
     { value: 'whitelist', label: $i18n.t('filters.whitelist') },
   ]);
   let selectedFilterType = $state<EventFilterType>();
-  let filters = $state<EventFilterWithId[]>([]);
-  function appendFilter(f: EventFilterWithId) {
-    filters = [...filters.filter((x) => x.type !== f.type), f];
+  let filters = $state<EventFilter[]>([]);
+  let filtersInScope = $derived(
+    filters.filter((filter) => isFilterApplicable({ filter, calendarId })),
+  );
+  function appendFilter(f: EventFilter) {
+    filters = [...filters.filter((x) => !isSameFilter(x, f)), f];
   }
-  function removeFilter(filterType: EventFilterType) {
-    filters = filters.filter((x) => x.type !== filterType);
+  function removeFilter(f: EventFilterIndentity) {
+    filters = filters.filter((x) => !isSameFilter(x, f));
+  }
+  function findFilterSafely<T extends EventFilterType>({
+    type,
+    scope,
+  }: EventFilterIndentity & { type: T }):
+    Extract<EventFilter, { type: T }> | undefined {
+    return filtersInScope.find((x) => isSameFilter(x, { type, scope })) as
+      Extract<EventFilter, { type: T }> | undefined;
+  }
+
+  function getFilterIdentity<T extends EventFilterType>(
+    type: T,
+    calendarId: CalendarIdType,
+  ): EventFilterIndentity & { type: T } {
+    switch (type) {
+      case 'range':
+      case 'recent':
+      case 'duration':
+        return { type, scope: newEventFilterScopeAll() };
+      case 'blacklist':
+      case 'whitelist':
+        return { type, scope: newEventFilterScopeSingle(calendarId) };
+    }
   }
 </script>
 
@@ -103,45 +142,70 @@
             </Select.Group>
           </Select.Content>
         </Select.Root>
-        <Button disabled={!filters?.length} onclick={() => (filters = [])}
+        <Button
+          disabled={!filtersInScope?.length}
+          onclick={() => (filters = [])}
           >{$i18n.t('filters.resetFilters')}</Button
         >
         {#if selectedFilterType === 'recent'}
+          {@const filter = findFilterSafely(
+            getFilterIdentity(selectedFilterType, calendarId!),
+          )}
           <EventRecentFilterComp
             {locale}
             onadd={appendFilter}
             onremove={removeFilter}
-            isEdit={filters.find((x) => x.type === selectedFilterType)}
+            isEdit={filter}
+            defaultValue={filter?.value}
           />
         {:else if selectedFilterType === 'duration'}
+          {@const filter = findFilterSafely(
+            getFilterIdentity(selectedFilterType, calendarId!),
+          )}
           <EventDurationFilterComp
             {locale}
             onadd={appendFilter}
             onremove={removeFilter}
-            isEdit={filters.find((x) => x.type === selectedFilterType)}
+            isEdit={filter}
+            defaultValue={filter?.value}
           />
         {:else if selectedFilterType === 'range'}
+          {@const filter = findFilterSafely(
+            getFilterIdentity(selectedFilterType, calendarId!),
+          )}
           <EventRangeFilterComp
             {locale}
             onadd={appendFilter}
             onremove={removeFilter}
-            isEdit={filters.find((x) => x.type === selectedFilterType)}
+            isEdit={filter}
+            defaultStart={filter?.start}
+            defaultEnd={filter?.end}
           />
         {:else if selectedFilterType === 'whitelist'}
+          {@const filter = findFilterSafely(
+            getFilterIdentity(selectedFilterType, calendarId!),
+          )}
           <EventCategoriesWhiteFilterComp
             {locale}
             onadd={appendFilter}
             onremove={removeFilter}
             {categories}
-            isEdit={filters.find((x) => x.type === selectedFilterType)}
+            isEdit={filter}
+            defaultValue={filter?.value}
+            calendarId={calendarId!}
           />
         {:else if selectedFilterType === 'blacklist'}
+          {@const filter = findFilterSafely(
+            getFilterIdentity(selectedFilterType, calendarId!),
+          )}
           <EventCategoriesBlackFilterComp
             {locale}
             onadd={appendFilter}
             onremove={removeFilter}
             {categories}
-            isEdit={filters.find((x) => x.type === selectedFilterType)}
+            isEdit={filter}
+            defaultValue={filter?.value}
+            calendarId={calendarId!}
           />
         {/if}
       </div>

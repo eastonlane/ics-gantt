@@ -1,10 +1,10 @@
 <script lang="ts">
+  import i18n from '$lib/i18n';
+  import type { EventFilterType } from '$lib/types/ics-event-filter';
   import {
     dayDurationFilter,
-    type EventFilterType,
+    newEventFilterScopeAll,
   } from '$lib/utils/ics-event-filter';
-  import i18n from '$lib/i18n';
-  import { onMount } from 'svelte';
   import { Button } from '../ui/button';
   import { InputGroupAddon, InputGroupInput } from '../ui/input-group';
   import InputGroup from '../ui/input-group/input-group.svelte';
@@ -18,12 +18,8 @@
     defaultValue,
   }: Props & { defaultValue?: number } = $props();
 
-  let dayCount = $state<number>();
-  onMount(() => {
-    if (defaultValue) {
-      dayCount = defaultValue;
-    }
-  });
+  // svelte-ignore state_referenced_locally
+  let dayCount = $state(defaultValue);
 </script>
 
 <InputGroup class="w-24">
@@ -39,10 +35,7 @@
 <Button
   onclick={() => {
     if (dayCount) {
-      onadd({
-        type: filterType,
-        filter: dayDurationFilter(dayCount),
-      });
+      onadd(dayDurationFilter(dayCount));
     }
   }}>{$i18n.t(isEdit ? 'filters.editFilter' : 'filters.addFilter')}</Button
 >
@@ -50,7 +43,7 @@
 {#if isEdit}
   <Button
     onclick={() => {
-      onremove(filterType);
+      onremove({ type: filterType, scope: newEventFilterScopeAll() });
     }}>{$i18n.t('filters.removeFilter')}</Button
   >
 {/if}
