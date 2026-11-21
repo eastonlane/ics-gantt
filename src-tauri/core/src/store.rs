@@ -61,12 +61,12 @@ impl CalendarStore {
 
     pub fn update(
         &self,
-        name: &String,
+        id: &String,
         calendar: &CalendarType,
     ) -> Result<Vec<CalendarType>, StoreError> {
         let mut calendars = self.read()?;
         for cal in calendars.iter_mut() {
-            if cal.name() == name {
+            if cal.id() == id {
                 *cal = calendar.clone();
                 break;
             }
@@ -79,11 +79,11 @@ impl CalendarStore {
         self.write(calendars)
     }
 
-    pub fn remove_named(&self, name: &str) -> Result<Vec<CalendarType>, StoreError> {
+    pub fn remove_calendar(&self, id: &str) -> Result<Vec<CalendarType>, StoreError> {
         let calendars: Vec<_> = self
             .read()?
             .into_iter()
-            .filter(|calendar| calendar.name() != name)
+            .filter(|calendar| calendar.id() != id)
             .collect();
         self.write(&calendars)?;
         Ok(calendars)
@@ -93,8 +93,8 @@ impl CalendarStore {
         &self.data_path_root
     }
 
-    pub fn save_ics(&self, name: &str, contents: &[u8]) -> Result<String, StoreError> {
-        let path = managed_ics_path(&self.data_path_root, name);
+    pub fn save_ics(&self, file_name: &str, contents: &[u8]) -> Result<String, StoreError> {
+        let path = managed_ics_path(&self.data_path_root, file_name);
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent).map_err(StoreError::Io)?;
         }
@@ -111,8 +111,8 @@ impl CalendarStore {
         fs::read(target).map_err(StoreError::Io)
     }
 
-    pub fn remove_ics(&self, name: &str) -> Result<(), StoreError> {
-        let path = managed_ics_path(&self.data_path_root, name);
+    pub fn remove_ics(&self, file_name: &str) -> Result<(), StoreError> {
+        let path = managed_ics_path(&self.data_path_root, file_name);
         if fs::exists(path.clone()).map_err(StoreError::Io)? {
             fs::remove_file(path).map_err(StoreError::Io)?;
         }

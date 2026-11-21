@@ -35,6 +35,7 @@ impl CalendarService {
         &self,
         calendar: CalendarType,
     ) -> Result<Vec<CalendarType>, ServiceError> {
+        let calendar = CalendarType::ensure_id(calendar);
         let calendar = match calendar {
             CalendarType::Url(mut url_calendar) => {
                 let contents = api::get_ics_from_url(&url_calendar.url)
@@ -42,7 +43,7 @@ impl CalendarService {
                     .map_err(ServiceError::API)?;
                 let path = self
                     .store
-                    .save_ics(&url_calendar.name, contents.as_bytes())
+                    .save_ics(&url_calendar.id, contents.as_bytes())
                     .map_err(ServiceError::Store)?;
                 url_calendar.path = path.clone();
                 url_calendar.last_sync = SystemTime::now()
@@ -56,11 +57,11 @@ impl CalendarService {
         self.store.save(&calendar).map_err(ServiceError::Store)
     }
 
-    pub async fn sync_calendar(&self, name: String) -> Result<Vec<u8>, ServiceError> {
+    pub async fn sync_calendar(&self, id: String) -> Result<Vec<u8>, ServiceError> {
         let mut calendars = self.store.read().map_err(ServiceError::Store)?;
         let calendar = calendars
             .iter_mut()
-            .find(|calendar| calendar.name() == name)
+            .find(|calendar| calendar.id() == id)
             .ok_or(ServiceError::NotFound)?;
 
         let CalendarType::Url(url_calendar) = calendar else {
@@ -72,7 +73,7 @@ impl CalendarService {
             .map_err(ServiceError::API)?;
         let path = self
             .store
-            .save_ics(&name, contents.as_bytes())
+            .save_ics(&id, contents.as_bytes())
             .map_err(ServiceError::Store)?;
 
         url_calendar.path = path.clone();
@@ -82,7 +83,7 @@ impl CalendarService {
             .as_secs() as i64;
 
         self.store
-            .update(&name, calendar)
+            .update(&id, calendar)
             .map_err(ServiceError::Store)?;
 
         self.read_ics(&path)
@@ -90,26 +91,26 @@ impl CalendarService {
 
     pub fn update_calendar(
         &self,
-        name: &String,
+        id: &String,
         calendar: &CalendarType,
     ) -> Result<Vec<CalendarType>, ServiceError> {
         self.store
-            .update(name, &calendar)
+            .update(id, &calendar)
             .map_err(ServiceError::Store)
     }
 
-    pub fn remove_calendar(&self, name: &str) -> Result<Vec<CalendarType>, ServiceError> {
-        self.store.remove_ics(name).map_err(ServiceError::Store)?;
-        self.store.remove_named(name).map_err(ServiceError::Store)
+    pub fn remove_calendar(&self, id: &str) -> Result<Vec<CalendarType>, ServiceError> {
+        self.store.remove_ics(id).map_err(ServiceError::Store)?;
+        self.store.remove_calendar(id).map_err(ServiceError::Store)
     }
 
     pub fn save_all(&self, calendars: &[CalendarType]) -> Result<(), ServiceError> {
         self.store.replace(calendars).map_err(ServiceError::Store)
     }
 
-    pub fn save_ics(&self, name: &str, contents: &[u8]) -> Result<String, ServiceError> {
+    pub fn save_ics(&self, id: &str, contents: &[u8]) -> Result<String, ServiceError> {
         self.store
-            .save_ics(name, contents)
+            .save_ics(id, contents)
             .map_err(ServiceError::Store)
     }
 
@@ -117,8 +118,10 @@ impl CalendarService {
         self.store.read_ics(path).map_err(ServiceError::Store)
     }
 
-    pub fn remove_ics(&self, name: &str) -> Result<(), ServiceError> {
-        self.store.remove_ics(name).map_err(ServiceError::Store)
+    pub fn remove_ics(&self, file_name: &str) -> Result<(), ServiceError> {
+        self.store
+            .remove_ics(file_name)
+            .map_err(ServiceError::Store)
     }
 }
 
