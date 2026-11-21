@@ -14,8 +14,8 @@
   import i18n from '$lib/i18n';
   import type { createAppState } from '$lib/state.svelte';
   import { appCalendarStore } from '$lib/stores/data';
-  import type { AppIcsCalendar } from '$lib/stores/model';
   import { sidebarContent } from '$lib/stores/sidebar';
+  import type { AppIcsCalendar } from '$lib/types/data';
   import type {
     CalendarIdType,
     EventFilter,
