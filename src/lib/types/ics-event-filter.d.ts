@@ -53,3 +53,8 @@ export type EventFilterMetadata =
       type: 'blacklist';
       value: string[];
     };
+
+export interface DateRange {
+  start: number; //Inclusive
+  end: number; //Inclusive
+}

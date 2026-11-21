@@ -3,6 +3,7 @@ import type {
   ConcreteEventFilter,
   EventFilterFunc,
 } from '$lib/types/ics-event-filter';
+import { eventRange } from './helpers';
 
 export function dayDurationFilter(
   maxDurationInDay: number,
@@ -17,10 +18,8 @@ export function dayDurationFilter(
 
 function durationFilter(maxDurationMs: number): EventFilterFunc {
   return (ev) => {
-    if (!ev.end) {
-      return true;
-    }
-    const duration = ev.end.date.getTime() - ev.start.date.getTime();
+    const range = eventRange(ev);
+    const duration = range.end - range.start;
     return duration <= maxDurationMs;
   };
 }

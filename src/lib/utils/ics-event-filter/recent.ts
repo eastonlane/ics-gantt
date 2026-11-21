@@ -1,5 +1,6 @@
 import { DAY } from '$lib/const.time';
 import type { ConcreteEventFilter } from '$lib/types/ics-event-filter';
+import { eventRange, hasOverlap, recentRange } from './helpers';
 
 export function recentDaysFilter(
   days: number = 7,
@@ -9,15 +10,7 @@ export function recentDaysFilter(
     scope: { kind: 'all' },
     value: days,
     filterFunc: (ev) => {
-      const now = Date.now();
-      const threshold = DAY * days;
-
-      const isStartWithinFuture = ev.start.date.getTime() <= now + threshold;
-      const isEndWithinPast = ev.end
-        ? ev.end.date.getTime() >= now - threshold
-        : false;
-
-      return isStartWithinFuture && isEndWithinPast;
+      return hasOverlap(recentRange(Date.now(), DAY * days), eventRange(ev));
     },
   };
 }
