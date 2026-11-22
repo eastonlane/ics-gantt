@@ -28,6 +28,7 @@
     newEventFilterScopeAll,
     newEventFilterScopeSingle,
   } from '$lib/utils/ics-event-filter';
+  import { mode } from 'mode-watcher';
 
   import { getContext, onMount } from 'svelte';
 
@@ -210,7 +211,7 @@
         {/if}
       </div>
 
-      <SVARGanttChart {events} {locale} isDark={appState.isDarkTheme} />
+      <SVARGanttChart {events} {locale} isDark={mode.current == 'dark'} />
     </div>
   {:else}
     <!-- <div>
