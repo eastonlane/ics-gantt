@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { buttonVariants } from '$lib/components/ui/button';
+  import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import * as Select from '$lib/components/ui/select';
   import * as Sidebar from '$lib/components/ui/sidebar';
   import { TooltipProvider } from '$lib/components/ui/tooltip';
@@ -8,6 +10,9 @@
   import { initStore, restoreCalendars } from '$lib/stores/data';
   import { sidebarContent } from '$lib/stores/sidebar';
   import type { SupportedLocale } from '$lib/types/locale';
+  import MoonIcon from '@lucide/svelte/icons/moon';
+  import SunIcon from '@lucide/svelte/icons/sun';
+  import { ModeWatcher, resetMode, setMode } from 'mode-watcher';
   import { setContext } from 'svelte';
   import './layout.css';
 
@@ -21,15 +26,6 @@
   const appState = createAppState();
 
   setContext(appStateKey, appState);
-
-  let isDark = $state(false);
-  $effect(() => {
-    appState.isDarkTheme = isDark;
-    document.documentElement.setAttribute(
-      'data-theme',
-      isDark ? 'dark' : 'light',
-    );
-  });
 
   const localeItems: { label: string; value: string }[] = [
     { value: 'zh-CN', label: '简体中文' },
@@ -46,6 +42,7 @@
   });
 </script>
 
+<ModeWatcher />
 <Sidebar.Provider class="h-svh max-h-svh">
   {#if $sidebarContent}
     {@render $sidebarContent()}
@@ -59,12 +56,30 @@
         </div>
 
         <div class="app-control">
-          <div class="theme-switch-wrapper">
-            <label class="theme-switch" aria-label={$i18n.t('theme')}>
-              <input type="checkbox" bind:checked={isDark} />
-              <div class="slider round"></div>
-            </label>
-          </div>
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger
+              class={buttonVariants({ variant: 'outline', size: 'icon' })}
+            >
+              <SunIcon
+                class="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all! dark:scale-0 dark:-rotate-90"
+              />
+              <MoonIcon
+                class="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all! dark:scale-100 dark:rotate-0"
+              />
+              <span class="sr-only">Toggle theme</span>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content align="end" placeholder={$i18n.t('theme')}>
+              <DropdownMenu.Item onclick={() => setMode('light')}
+                >Light</DropdownMenu.Item
+              >
+              <DropdownMenu.Item onclick={() => setMode('dark')}
+                >Dark</DropdownMenu.Item
+              >
+              <DropdownMenu.Item onclick={() => resetMode()}
+                >System</DropdownMenu.Item
+              >
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
 
           <Select.Root type="single" bind:value={locale} items={localeItems}>
             <Select.Trigger class="w-45">
@@ -136,62 +151,6 @@
     display: flex;
     justify-content: space-between;
     gap: 10px;
-  }
-
-  .theme-switch-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-  }
-
-  .theme-switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 26px;
-  }
-  .theme-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: 0.4s;
-    border-radius: 34px;
-  }
-
-  .slider:before {
-    position: absolute;
-    content: '☀️';
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 20px;
-    width: 20px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: 0.4s;
-    border-radius: 50%;
-    font-size: 12px;
-  }
-
-  .theme-switch input:checked + .slider {
-    background-color: #666;
-  }
-
-  .theme-switch input:checked + .slider:before {
-    transform: translateX(24px);
-    content: '🌙';
   }
 
   main {
