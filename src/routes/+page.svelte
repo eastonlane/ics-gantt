@@ -121,10 +121,12 @@
   <CalendarPageSidebar />
 {/snippet}
 
-<div class="page-container">
+<div
+  class="box-border flex h-full min-h-0 w-full min-w-0 flex-col gap-4 overflow-hidden px-[2vw] pt-[1vh] pb-[24px]"
+>
   {#if icsCalendar?.events}
-    <div class="gantt-wrapper">
-      <div class="tool-bar">
+    <div class="flex h-full min-h-0 w-full min-w-0 flex-col gap-3">
+      <div class="flex flex-row gap-2.5">
         <Select.Root
           type="single"
           bind:value={selectedFilterType}
@@ -226,35 +228,3 @@
     </div> -->
   {/if}
 </div>
-
-<style>
-  .page-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    min-height: 0;
-    height: 100%;
-    overflow: hidden;
-    padding: 1vh 2vw 24px;
-    box-sizing: border-box;
-    align-items: stretch;
-    min-width: 0;
-    width: 100%;
-  }
-
-  .gantt-wrapper {
-    min-height: 0;
-    height: 100%;
-    min-width: 0;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 3vh;
-  }
-
-  .tool-bar {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-  }
-</style>
