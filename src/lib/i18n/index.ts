@@ -12,6 +12,10 @@ void i18next.init({
   interpolation: { escapeValue: false },
 });
 
+i18next.services.formatter?.add('bold', (value) => {
+  return `<strong>${value}</strong>`;
+});
+
 const i18n = createI18nStore(i18next);
 export { i18next };
 export default i18n;

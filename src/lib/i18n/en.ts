@@ -33,6 +33,25 @@ const en = {
     invalidRange: 'Start date must not be after the end date.',
     invalidRangeError: 'Invalid date range.',
     categoryPlaceholder: 'Category',
+    overview: {
+      empty: 'No active filter',
+      heading: 'Filter calendar events that:',
+    },
+    description: {
+      range: {
+        closed: 'Last between {{start,bold}} and {{end,bold}}',
+        after: 'End after {{value,bold}}',
+        before: 'Start before {{value, bold}}',
+      },
+      recent_one: 'In recent {{count, bold}} day',
+      recent_other: 'In recent {{count, bold}} days',
+      duration_one: 'Last for no more than {{count, bold}} day',
+      duration_other: 'Last for no more than {{count, bold}} days',
+      whitelist_single: 'Are this category: {{value, bold}}',
+      whitelist_multiple: 'Are one these categories: {{value, bold}}',
+      blacklist_single: 'Are not this category: {{value, bold}}',
+      blacklist_multiple: 'Are none of these categories: {{value, bold}}',
+    },
   },
 
   calendar: {

@@ -8,6 +8,16 @@ import type { DateValue } from '@internationalized/date';
 import { endOfDay, startOfDay } from 'date-fns';
 import type { IcsEvent } from 'ts-ics';
 
+export function getFilterIdentify(filter: EventFilter): string {
+  const arr: string[] = [filter.type, filter.scope.kind];
+  switch (filter.scope.kind) {
+    case 'single':
+      arr.push(filter.scope.calendarId);
+      break;
+  }
+  return arr.join('');
+}
+
 export function isFilterApplicable({
   filter: f,
   calendarId,

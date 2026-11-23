@@ -33,6 +33,23 @@ const zhCN = {
     invalidRange: '开始日期不能晚于结束日期。',
     invalidRangeError: '日期范围无效。',
     categoryPlaceholder: '分类',
+    overview: {
+      empty: '没有生效中的筛选条件',
+      heading: '将筛选符合以下条件的日程：',
+    },
+    description: {
+      range: {
+        closed: '发生在 {{start,bold}}~{{end,bold}} 内',
+        after: '结束时间晚于 {{value,bold}}',
+        before: '开始时间早于 {{value, bold}}',
+      },
+      recent: '发生在近 {{count, bold}} 天',
+      duration: '持续时间不超过 {{count, bold}} 天',
+      whitelist_single: '类别是 {{value, bold}}',
+      whitelist_multiple: '类别是 [{{value, bold}}] 中的任意一种',
+      blacklist_single: '类别不是 {{value, bold}}',
+      blacklist_multiple: '类别不是 [{{value, bold}}] 中的任意一种',
+    },
   },
 
   calendar: {

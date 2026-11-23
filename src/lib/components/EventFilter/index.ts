@@ -3,3 +3,4 @@ export { default as EventCategoriesWhiteFilterComp } from './CategoriesWhite.sve
 export { default as EventDurationFilterComp } from './Duration.svelte';
 export { default as EventRangeFilterComp } from './Range.svelte';
 export { default as EventRecentFilterComp } from './Recent.svelte';
+export { default as EventFilterDescriber } from './Describer.svelte'
