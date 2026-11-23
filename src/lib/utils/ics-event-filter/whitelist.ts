@@ -7,13 +7,14 @@ export function categoriesWhiteFilter(
   whiteList: string[] = [],
   calendarId: CalendarIdType,
 ): ConcreteEventFilter<'whitelist'> {
+  const value = [...whiteList];
   return {
     type: 'whitelist',
     scope: { kind: 'single', calendarId },
-    value: whiteList,
+    value,
     filterFunc: (ev) =>
       ev.categories
-        ? ev.categories.some((x) => whiteList.some((y) => y === x))
+        ? ev.categories.some((x) => value.some((y) => y === x))
         : false,
   };
 }

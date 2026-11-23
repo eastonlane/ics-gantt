@@ -29,10 +29,6 @@
   // svelte-ignore state_referenced_locally
   let seletedCategories = $state<string[]>(defaultCategories ?? []);
   let isAddable = $derived(!!seletedCategories?.length);
-
-  function resetInput() {
-    seletedCategories = [];
-  }
 </script>
 
 <Select.Root type="multiple" bind:value={seletedCategories}>
@@ -54,7 +50,6 @@
   onclick={() => {
     if (isAddable) {
       onadd(categoriesWhiteFilter(seletedCategories, calendarId));
-      resetInput();
     }
   }}>{$i18n.t(isEdit ? 'filters.editFilter' : 'filters.addFilter')}</Button
 >

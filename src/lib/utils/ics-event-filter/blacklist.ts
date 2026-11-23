@@ -7,13 +7,14 @@ export function categoriesBlackFilter(
   blackList: string[] = [],
   calendarId: CalendarIdType,
 ): ConcreteEventFilter<'blacklist'> {
+  const value = [...blackList];
   return {
     type: 'blacklist',
     scope: { kind: 'single', calendarId },
-    value: blackList,
+    value,
     filterFunc: (ev) =>
       ev.categories
-        ? ev.categories.some((x) => blackList.every((y) => y !== x))
+        ? ev.categories.some((x) => value.every((y) => y !== x))
         : true,
   };
 }
