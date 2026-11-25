@@ -1,4 +1,6 @@
 <script lang="ts">
+  import DatePicker from '$lib/components/composed/DatePicker.svelte';
+  import { Button } from '$lib/components/ui/button';
   import * as Tooltip from '$lib/components/ui/tooltip';
   import i18n from '$lib/i18n';
   import type { EventFilterType } from '$lib/types/ics-event-filter';
@@ -7,8 +9,6 @@
     newEventFilterScopeAll,
   } from '$lib/utils/ics-event-filter';
   import { type DateValue } from '@internationalized/date';
-  import DatePicker from '../composed/DatePicker.svelte';
-  import { Button } from '../ui/button';
   import type { Props } from './props';
 
   const filterType: EventFilterType = 'range';

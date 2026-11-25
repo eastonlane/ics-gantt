@@ -33,6 +33,15 @@ const en = {
     invalidRange: 'Start date must not be after the end date.',
     invalidRangeError: 'Invalid date range.',
     categoryPlaceholder: 'Category',
+    editor: {
+      tips: {
+        whitelist: 'Select categories to include',
+        blacklist: 'Select categories to exclude',
+      },
+    },
+    workspace: {
+      tittle: 'Calendar Event Filters',
+    },
     overview: {
       empty: 'No active filter',
       heading: 'Filter calendar events that:',

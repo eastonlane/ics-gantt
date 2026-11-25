@@ -1,13 +1,12 @@
 <script lang="ts">
+  import { Button } from '$lib/components/ui/button';
+  import * as InputGroup from '$lib/components/ui/input-group';
   import i18n from '$lib/i18n';
   import type { EventFilterType } from '$lib/types/ics-event-filter';
   import {
     dayDurationFilter,
     newEventFilterScopeAll,
   } from '$lib/utils/ics-event-filter';
-  import { Button } from '../ui/button';
-  import { InputGroupAddon, InputGroupInput } from '../ui/input-group';
-  import InputGroup from '../ui/input-group/input-group.svelte';
   import type { Props } from './props';
 
   const filterType: EventFilterType = 'duration';
@@ -22,15 +21,17 @@
   let dayCount = $state(defaultValue);
 </script>
 
-<InputGroup class="w-24">
-  <InputGroupInput
+<InputGroup.Root class="w-24">
+  <InputGroup.Input
     type="number"
     defaultValue="30"
     min="1"
     bind:value={dayCount}
   />
-  <InputGroupAddon align="inline-end">{$i18n.t('common.days')}</InputGroupAddon>
-</InputGroup>
+  <InputGroup.Addon align="inline-end"
+    >{$i18n.t('common.days')}</InputGroup.Addon
+  >
+</InputGroup.Root>
 
 <Button
   onclick={() => {

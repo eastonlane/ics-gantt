@@ -1,15 +1,12 @@
 <script lang="ts">
   import {
-    EventCategoriesBlackFilterComp,
-    EventCategoriesWhiteFilterComp,
-    EventDurationFilterComp,
-    EventRangeFilterComp,
-    EventRecentFilterComp,
+    EventFilterDescriber,
+    EventFilterEditor,
   } from '$lib/components/EventFilter';
   import { CalendarPageSidebar } from '$lib/components/sidebar';
   import SVARGanttChart from '$lib/components/svar-gantt/SVARGanttChart.svelte';
   import Button from '$lib/components/ui/button/button.svelte';
-  import * as Select from '$lib/components/ui/select';
+  import * as Card from '$lib/components/ui/card';
   import { appStateKey } from '$lib/const';
   import i18n from '$lib/i18n';
   import type { createAppState } from '$lib/state.svelte';
@@ -17,17 +14,15 @@
   import { sidebarContent } from '$lib/stores/sidebar';
   import type { AppIcsCalendar } from '$lib/types/data';
   import type {
-    CalendarIdType,
     EventFilter,
     EventFilterIndentity,
-    EventFilterType,
   } from '$lib/types/ics-event-filter';
   import {
+    dateRangeFilter,
     isFilterApplicable,
     isSameFilter,
-    newEventFilterScopeAll,
-    newEventFilterScopeSingle,
   } from '$lib/utils/ics-event-filter';
+  import { getLocalTimeZone, today } from '@internationalized/date';
   import { mode } from 'mode-watcher';
 
   import { getContext, onMount } from 'svelte';
@@ -74,15 +69,11 @@
       .reduce((cur, val) => cur.add(val), new Set<string>()),
   ]);
 
-  const filterTypeItems = $derived([
-    { value: 'recent', label: $i18n.t('filters.recent') },
-    { value: 'duration', label: $i18n.t('filters.duration') },
-    { value: 'range', label: $i18n.t('filters.range') },
-    { value: 'blacklist', label: $i18n.t('filters.blacklist') },
-    { value: 'whitelist', label: $i18n.t('filters.whitelist') },
-  ]);
-  let selectedFilterType = $state<EventFilterType>();
-  let filters = $state<EventFilter[]>([]);
+  let selectedFilterIdentity = $state<EventFilterIndentity>({
+    type: 'range',
+    scope: { kind: 'all' },
+  });
+  let filters = $state<EventFilter[]>([defaultDateRangeFilter()]);
   let filtersInScope = $derived(
     filters.filter((filter) => isFilterApplicable({ filter, calendarId })),
   );
@@ -92,28 +83,12 @@
   function removeFilter(f: EventFilterIndentity) {
     filters = filters.filter((x) => !isSameFilter(x, f));
   }
-  function findFilterSafely<T extends EventFilterType>({
-    type,
-    scope,
-  }: EventFilterIndentity & { type: T }):
-    Extract<EventFilter, { type: T }> | undefined {
-    return filtersInScope.find((x) => isSameFilter(x, { type, scope })) as
-      Extract<EventFilter, { type: T }> | undefined;
-  }
 
-  function getFilterIdentity<T extends EventFilterType>(
-    type: T,
-    calendarId: CalendarIdType,
-  ): EventFilterIndentity & { type: T } {
-    switch (type) {
-      case 'range':
-      case 'recent':
-      case 'duration':
-        return { type, scope: newEventFilterScopeAll() };
-      case 'blacklist':
-      case 'whitelist':
-        return { type, scope: newEventFilterScopeSingle(calendarId) };
-    }
+  function defaultDateRangeFilter(): EventFilter {
+    return dateRangeFilter(
+      today(getLocalTimeZone()).add({ days: -4 }),
+      today(getLocalTimeZone()).add({ days: 8 }),
+    )!;
   }
 </script>
 
@@ -122,96 +97,49 @@
 {/snippet}
 
 <div
-  class="box-border flex h-full min-h-0 w-full min-w-0 flex-col gap-4 overflow-hidden px-[2vw] pt-[1vh] pb-[24px]"
+  class="box-border flex h-full min-h-0 w-full min-w-0 flex-col gap-4 overflow-hidden px-[2vw] pt-[1vh] pb-6"
 >
-  {#if icsCalendar?.events}
+  {#if calendarId && icsCalendar?.events}
     <div class="flex h-full min-h-0 w-full min-w-0 flex-col gap-3">
-      <div class="flex flex-row gap-2.5">
-        <Select.Root
-          type="single"
-          bind:value={selectedFilterType}
-          items={filterTypeItems}
-        >
-          <Select.Trigger class="w-45">
-            <Select.Value placeholder={$i18n.t('filters.placeholder')} />
-          </Select.Trigger>
-          <Select.Content>
-            <Select.Group>
-              {#each filterTypeItems as item (item)}
-                <Select.Item value={item.value}>
-                  {item.label}
-                </Select.Item>
-              {/each}
-            </Select.Group>
-          </Select.Content>
-        </Select.Root>
-        <Button
-          disabled={!filtersInScope?.length}
-          onclick={() => (filters = [])}
-          >{$i18n.t('filters.resetFilters')}</Button
-        >
-        {#if selectedFilterType === 'recent'}
-          {@const filter = findFilterSafely(
-            getFilterIdentity(selectedFilterType, calendarId!),
-          )}
-          <EventRecentFilterComp
-            {locale}
-            onadd={appendFilter}
-            onremove={removeFilter}
-            isEdit={filter}
-            defaultValue={filter?.value}
-          />
-        {:else if selectedFilterType === 'duration'}
-          {@const filter = findFilterSafely(
-            getFilterIdentity(selectedFilterType, calendarId!),
-          )}
-          <EventDurationFilterComp
-            {locale}
-            onadd={appendFilter}
-            onremove={removeFilter}
-            isEdit={filter}
-            defaultValue={filter?.value}
-          />
-        {:else if selectedFilterType === 'range'}
-          {@const filter = findFilterSafely(
-            getFilterIdentity(selectedFilterType, calendarId!),
-          )}
-          <EventRangeFilterComp
-            {locale}
-            onadd={appendFilter}
-            onremove={removeFilter}
-            isEdit={filter}
-            defaultStart={filter?.start}
-            defaultEnd={filter?.end}
-          />
-        {:else if selectedFilterType === 'whitelist'}
-          {@const filter = findFilterSafely(
-            getFilterIdentity(selectedFilterType, calendarId!),
-          )}
-          <EventCategoriesWhiteFilterComp
-            {locale}
-            onadd={appendFilter}
-            onremove={removeFilter}
-            {categories}
-            isEdit={filter}
-            defaultValue={filter?.value}
-            calendarId={calendarId!}
-          />
-        {:else if selectedFilterType === 'blacklist'}
-          {@const filter = findFilterSafely(
-            getFilterIdentity(selectedFilterType, calendarId!),
-          )}
-          <EventCategoriesBlackFilterComp
-            {locale}
-            onadd={appendFilter}
-            onremove={removeFilter}
-            {categories}
-            isEdit={filter}
-            defaultValue={filter?.value}
-            calendarId={calendarId!}
-          />
-        {/if}
-      </div>
+      <!--Filter Helpers-->
+      <Card.Root class="pt-0">
+        <Card.Header class="border-b bg-muted px-4 pt-4">
+          <Card.Title>{$i18n.t('filters.workspace.tittle')}</Card.Title>
+          <Card.Action>
+            <Button
+              disabled={!filtersInScope?.length}
+              onclick={() => (filters = [])}
+              >{$i18n.t('filters.resetFilters')}</Button
+            >
+          </Card.Action>
+        </Card.Header>
+        <Card.Content>
+          <div class="flex min-w-0 justify-between">
+            <!--Filter Overview-->
+            <section class="min-w-[240px] flex-1 border-r pr-6">
+              <EventFilterDescriber
+                filters={filtersInScope}
+                selected={selectedFilterIdentity}
+                onFilterChecked={(f) => (selectedFilterIdentity = f)}
+              />
+            </section>
+
+            <!--Filter Editor-->
+            <section class="min-w-0 flex-[3]">
+              <div class="px-6">
+                <EventFilterEditor
+                  bind:selectedFilterIdentity
+                  filters={filtersInScope}
+                  {calendarId}
+                  {categories}
+                  {appendFilter}
+                  {removeFilter}
+                />
+              </div>
+            </section>
+          </div>
+        </Card.Content>
+      </Card.Root>
 
       <SVARGanttChart {events} {locale} isDark={mode.current == 'dark'} />
     </div>

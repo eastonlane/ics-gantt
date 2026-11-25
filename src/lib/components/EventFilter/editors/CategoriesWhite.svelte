@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Button } from '$lib/components/ui/button';
   import * as Select from '$lib/components/ui/select';
   import i18n from '$lib/i18n';
   import type {
@@ -6,19 +7,18 @@
     EventFilterType,
   } from '$lib/types/ics-event-filter';
   import {
-    categoriesBlackFilter,
+    categoriesWhiteFilter,
     newEventFilterScopeSingle,
   } from '$lib/utils/ics-event-filter';
-  import { Button } from '../ui/button';
   import type { Props } from './props';
 
-  const filterType: EventFilterType = 'blacklist';
+  const filterType: EventFilterType = 'whitelist';
   let {
     onadd,
     onremove,
     categories,
     isEdit,
-    defaultValue,
+    defaultValue: defaultCategories,
     calendarId,
   }: Props & {
     categories: string[];
@@ -27,13 +27,15 @@
   } = $props();
 
   // svelte-ignore state_referenced_locally
-  let seletedCategories = $state(defaultValue);
+  let seletedCategories = $state<string[]>(defaultCategories ?? []);
   let isAddable = $derived(!!seletedCategories?.length);
 </script>
 
 <Select.Root type="multiple" bind:value={seletedCategories}>
   <Select.Trigger>
-    <Select.Value placeholder={$i18n.t('filters.categoryPlaceholder')} />
+    <Select.Value placeholder={$i18n.t('filters.categoryPlaceholder')}
+      >{$i18n.t('filters.editor.tips.whitelist')}</Select.Value
+    >
   </Select.Trigger>
   <Select.Content>
     <Select.Group>
@@ -49,7 +51,7 @@
   disabled={!isAddable}
   onclick={() => {
     if (isAddable) {
-      onadd(categoriesBlackFilter(seletedCategories, calendarId));
+      onadd(categoriesWhiteFilter(seletedCategories, calendarId));
     }
   }}>{$i18n.t(isEdit ? 'filters.editFilter' : 'filters.addFilter')}</Button
 >

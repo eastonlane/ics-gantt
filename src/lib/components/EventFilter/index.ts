@@ -1,6 +1,2 @@
-export { default as EventCategoriesBlackFilterComp } from './CategoriesBlack.svelte';
-export { default as EventCategoriesWhiteFilterComp } from './CategoriesWhite.svelte';
-export { default as EventDurationFilterComp } from './Duration.svelte';
-export { default as EventRangeFilterComp } from './Range.svelte';
-export { default as EventRecentFilterComp } from './Recent.svelte';
-export { default as EventFilterDescriber } from './Describer.svelte'
+export { default as EventFilterDescriber } from './Describer.svelte';
+export { default as EventFilterEditor } from './Editor.svelte';

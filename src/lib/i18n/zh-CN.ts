@@ -33,6 +33,15 @@ const zhCN = {
     invalidRange: '开始日期不能晚于结束日期。',
     invalidRangeError: '日期范围无效。',
     categoryPlaceholder: '分类',
+    editor: {
+      tips: {
+        whitelist: '选择需要包含的类别',
+        blacklist: '选择需要排除的类别',
+      },
+    },
+    workspace: {
+      tittle: '日程过滤器',
+    },
     overview: {
       empty: '没有生效中的筛选条件',
       heading: '将筛选符合以下条件的日程：',
